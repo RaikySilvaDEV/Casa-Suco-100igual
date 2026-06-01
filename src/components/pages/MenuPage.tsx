@@ -18,7 +18,8 @@ import {
   Landmark,
   Edit2,
   UserCheck,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import { MENU_ITEMS, type MenuItem } from '../../data/mockData';
 import { type UserProfile } from '../ui/AuthModal';
@@ -32,6 +33,7 @@ interface MenuPageProps {
 interface CartItem {
   product: MenuItem;
   quantity: number;
+  customFruits?: string[];
 }
 
 const CATEGORIES = [
@@ -46,12 +48,30 @@ const CATEGORIES = [
   { id: 'chopp', label: 'Bebidas & Chopp' },
 ];
 
+const AVAILABLE_FRUITS = [
+  'Laranja',
+  'Morango',
+  'Abacaxi',
+  'Limão',
+  'Acerola',
+  'Maracujá',
+  'Manga',
+  'Melancia',
+  'Caju',
+  'Uva',
+];
+
 export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAuth }) => {
   const [activeCategory, setActiveCategory] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [addedAnimationId, setAddedAnimationId] = useState<string | null>(null);
+
+  // Juice Customization Modal States
+  const [customizationProduct, setCustomizationProduct] = useState<MenuItem | null>(null);
+  const [customizationMode, setCustomizationMode] = useState<'default' | 'custom'>('default');
+  const [selectedFruits, setSelectedFruits] = useState<string[]>([]);
 
   // Checkout configuration states (Step 2)
   const [checkoutStep, setCheckoutStep] = useState<'cart' | 'shipping'>('cart');
@@ -95,15 +115,25 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
   }, [activeCategory, searchQuery]);
 
   // Shopping Cart Actions
-  const addToCart = (product: MenuItem) => {
+  const addToCart = (product: MenuItem, customFruits?: string[]) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.product.id === product.id);
+      // Find item with same product ID AND exact same custom blend combination
+      const existingItem = prevCart.find((item) => {
+        const hasSameId = item.product.id === product.id;
+        const hasSameCustom = JSON.stringify(item.customFruits) === JSON.stringify(customFruits);
+        return hasSameId && hasSameCustom;
+      });
+
       if (existingItem) {
-        return prevCart.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
+        return prevCart.map((item) => {
+          const hasSameId = item.product.id === product.id;
+          const hasSameCustom = JSON.stringify(item.customFruits) === JSON.stringify(customFruits);
+          return hasSameId && hasSameCustom
+            ? { ...item, quantity: item.quantity + 1 }
+            : item;
+        });
       }
-      return [...prevCart, { product, quantity: 1 }];
+      return [...prevCart, { product, quantity: 1, customFruits }];
     });
 
     // Added visual feedback animation
@@ -111,11 +141,23 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     setTimeout(() => setAddedAnimationId(null), 1000);
   };
 
-  const updateQuantity = (productId: string, delta: number) => {
+  const handleProductAddClick = (product: MenuItem) => {
+    if (product.category === 'sucos') {
+      setCustomizationProduct(product);
+      setCustomizationMode('default');
+      setSelectedFruits([]);
+    } else {
+      addToCart(product);
+    }
+  };
+
+  const updateQuantity = (productId: string, delta: number, customFruits?: string[]) => {
     setCart((prevCart) => {
       return prevCart
         .map((item) => {
-          if (item.product.id === productId) {
+          const isSameId = item.product.id === productId;
+          const isSameCustom = JSON.stringify(item.customFruits) === JSON.stringify(customFruits);
+          if (isSameId && isSameCustom) {
             const newQty = item.quantity + delta;
             return { ...item, quantity: newQty };
           }
@@ -125,8 +167,12 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     });
   };
 
-  const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
+  const removeFromCart = (productId: string, customFruits?: string[]) => {
+    setCart((prevCart) => prevCart.filter((item) => {
+      const isSameId = item.product.id === productId;
+      const isSameCustom = JSON.stringify(item.customFruits) === JSON.stringify(customFruits);
+      return !(isSameId && isSameCustom);
+    }));
   };
 
   const cartTotal = useMemo(() => {
@@ -171,8 +217,15 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     cart.forEach((item) => {
       const priceVal = parseFloat(item.product.price.replace('R$ ', '').replace(',', '.'));
       const subtotal = (priceVal * item.quantity).toFixed(2).replace('.', ',');
-      message += `• *${item.quantity}x ${item.product.name}* (${item.product.price} un) = *R$ ${subtotal}*\n`;
-      if (item.product.ingredients.length > 0) {
+      
+      let finalName = item.product.name;
+      if (item.customFruits && item.customFruits.length > 0) {
+        finalName += ` (Mesclado: ${item.customFruits.join(' + ')})`;
+      }
+      
+      message += `• *${item.quantity}x ${finalName}* (${item.product.price} un) = *R$ ${subtotal}*\n`;
+      
+      if (!item.customFruits && item.product.ingredients.length > 0) {
         message += `  _Ingredientes: ${item.product.ingredients.slice(0, 3).join(', ')}_\n`;
       }
     });
@@ -198,10 +251,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     message += `_Pedido finalizado via site. Aguardamos sua confirmação e preparo!_`;
 
     const encodedText = encodeURIComponent(message);
-    
-    // Choose WhatsApp number depending on Unit selected
-    const whatsappNumber = pickupLocation === 'Paulo VI' ? '551637215494' : '551637215494'; // default numbers
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedText}`;
+    const whatsappUrl = `https://wa.me/551637215494?text=${encodedText}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -391,7 +441,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                           </div>
 
                           <button
-                            onClick={() => addToCart(product)}
+                            onClick={() => handleProductAddClick(product)}
                             className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wide cursor-pointer transition-all duration-300 ${
                               isAdded
                                 ? 'bg-green-500 text-white shadow-lg'
@@ -512,16 +562,18 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
               </div>
 
               {/* Drawer Scrollable Body Content */}
-              <div className="flex-grow overflow-y-auto p-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className="flex-grow overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {checkoutStep === 'cart' ? (
                   /* Step 1: Cart Items List */
                   cart.length > 0 ? (
                     cart.map((item) => {
                       const priceVal = parseFloat(item.product.price.replace('R$ ', '').replace(',', '.'));
                       const itemSubtotal = (priceVal * item.quantity).toFixed(2).replace('.', ',');
+                      const itemKey = item.product.id + (item.customFruits ? '-' + item.customFruits.join('-') : '');
+                      
                       return (
                         <div
-                          key={item.product.id}
+                          key={itemKey}
                           className="bg-[#111111] border border-white/5 rounded-2xl p-4 flex gap-4"
                         >
                           {/* Product Mini Image */}
@@ -537,11 +589,18 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                           <div className="flex-grow flex flex-col justify-between">
                             <div>
                               <div className="flex items-start justify-between gap-2">
-                                <h4 className="font-extrabold text-sm text-white leading-tight">
-                                  {item.product.name}
-                                </h4>
+                                <div>
+                                  <h4 className="font-extrabold text-sm text-white leading-tight">
+                                    {item.product.name}
+                                  </h4>
+                                  {item.customFruits && item.customFruits.length > 0 && (
+                                    <span className="text-[9px] font-black text-[#8ac926] bg-[#8ac926]/10 px-2 py-0.5 rounded-md mt-1 inline-block uppercase tracking-wide">
+                                      Mesclado: {item.customFruits.join(' + ')}
+                                    </span>
+                                  )}
+                                </div>
                                 <button
-                                  onClick={() => removeFromCart(item.product.id)}
+                                  onClick={() => removeFromCart(item.product.id, item.customFruits)}
                                   className="text-offWhite/25 hover:text-red-400 p-0.5 transition-colors cursor-pointer"
                                 >
                                   <Trash2 size={14} />
@@ -560,7 +619,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
 
                               <div className="flex items-center bg-[#1A1A1A] border border-white/5 rounded-xl px-1 py-0.5">
                                 <button
-                                  onClick={() => updateQuantity(item.product.id, -1)}
+                                  onClick={() => updateQuantity(item.product.id, -1, item.customFruits)}
                                   className="p-1.5 text-offWhite/65 hover:text-[#8ac926] transition-colors cursor-pointer"
                                 >
                                   <Minus size={12} className="stroke-[2.5]" />
@@ -569,7 +628,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                                   {item.quantity}
                                 </span>
                                 <button
-                                  onClick={() => updateQuantity(item.product.id, 1)}
+                                  onClick={() => updateQuantity(item.product.id, 1, item.customFruits)}
                                   className="p-1.5 text-offWhite/65 hover:text-[#8ac926] transition-colors cursor-pointer"
                                 >
                                   <Plus size={12} className="stroke-[2.5]" />
@@ -856,6 +915,148 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                 )}
               </div>
             </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Juice Customization Modal Overlay */}
+      <AnimatePresence>
+        {customizationProduct && (
+          <>
+            {/* Modal Backdrop */}
+            <motion.div
+              onClick={() => setCustomizationProduct(null)}
+              className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+
+            {/* Modal Dialog */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+              <motion.div
+                className="w-full max-w-md bg-[#0D0D0D]/95 border border-white/10 rounded-3xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)] pointer-events-auto overflow-y-auto max-h-[90vh] scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent text-left"
+                initial={{ scale: 0.9, y: 30, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.9, y: 30, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-5">
+                  <div>
+                    <h3 className="font-black text-base text-white uppercase tracking-tight">Personalizar Suco</h3>
+                    <p className="text-[9px] text-[#8ac926] font-bold uppercase tracking-wider mt-0.5">{customizationProduct.name}</p>
+                  </div>
+                  <button
+                    onClick={() => setCustomizationProduct(null)}
+                    className="p-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-offWhite transition-colors cursor-pointer"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+
+                {/* Content */}
+                <div className="space-y-5">
+                  {/* Recipe Mode Toggles */}
+                  <div className="flex bg-[#161616] p-1 rounded-xl gap-1">
+                    <button
+                      onClick={() => {
+                        setCustomizationMode('default');
+                        setSelectedFruits([]);
+                      }}
+                      className={`flex-grow py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        customizationMode === 'default'
+                          ? 'bg-[#8ac926] text-black shadow-md'
+                          : 'text-offWhite/65 hover:text-white bg-transparent'
+                      }`}
+                    >
+                      Receita Clássica
+                    </button>
+                    <button
+                      onClick={() => setCustomizationMode('custom')}
+                      className={`flex-grow py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        customizationMode === 'custom'
+                          ? 'bg-[#8ac926] text-black shadow-md'
+                          : 'text-offWhite/65 hover:text-white bg-transparent'
+                      }`}
+                    >
+                      Escolher 2 Frutas
+                    </button>
+                  </div>
+
+                  {customizationMode === 'default' ? (
+                    <div className="p-4 rounded-2xl bg-[#111111] border border-white/5 space-y-2">
+                      <span className="text-[9px] font-black text-offWhite/45 uppercase tracking-wider block">Ingredientes Clássicos</span>
+                      <p className="text-xs font-semibold text-white leading-relaxed">
+                        {customizationProduct.ingredients.join(', ')}
+                      </p>
+                      <p className="text-[10px] text-offWhite/50 leading-relaxed font-medium">
+                        Preparado exatamente com a nossa receita secreta tradicional de estúdio.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black text-offWhite/45 uppercase tracking-wider">Selecione até 2 frutas *</span>
+                        <span className="text-[9px] font-bold text-[#8ac926] uppercase bg-[#8ac926]/10 px-2 py-0.5 rounded">
+                          {selectedFruits.length} de 2 selecionadas
+                        </span>
+                      </div>
+
+                      {/* Fruits Selection Grid */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {AVAILABLE_FRUITS.map((fruit) => {
+                          const isFruitSelected = selectedFruits.includes(fruit);
+                          return (
+                            <button
+                              key={fruit}
+                              type="button"
+                              onClick={() => {
+                                if (isFruitSelected) {
+                                  setSelectedFruits(prev => prev.filter(f => f !== fruit));
+                                } else {
+                                  if (selectedFruits.length < 2) {
+                                    setSelectedFruits(prev => [...prev, fruit]);
+                                  }
+                                }
+                              }}
+                              className={`py-3 rounded-xl border text-center text-xs font-bold uppercase transition-all cursor-pointer ${
+                                isFruitSelected
+                                  ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926]'
+                                  : selectedFruits.length >= 2
+                                  ? 'bg-[#111111] border-white/5 text-offWhite/25 opacity-50 cursor-not-allowed'
+                                  : 'bg-[#111111] border-white/5 text-offWhite/65 hover:text-white hover:border-white/10'
+                              }`}
+                              disabled={!isFruitSelected && selectedFruits.length >= 2}
+                            >
+                              {fruit}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add action */}
+                  <button
+                    onClick={() => {
+                      if (customizationMode === 'custom' && selectedFruits.length === 0) {
+                        return; // must select at least 1 fruit in custom mode
+                      }
+                      addToCart(
+                        customizationProduct,
+                        customizationMode === 'custom' ? selectedFruits : undefined
+                      );
+                      setCustomizationProduct(null);
+                    }}
+                    disabled={customizationMode === 'custom' && selectedFruits.length === 0}
+                    className="w-full mt-2 flex items-center justify-center py-4 rounded-2xl bg-[#8ac926] disabled:bg-white/5 disabled:text-offWhite/25 text-black font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-[#8ac926]/10"
+                  >
+                    Confirmar e Adicionar à Sacola
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
