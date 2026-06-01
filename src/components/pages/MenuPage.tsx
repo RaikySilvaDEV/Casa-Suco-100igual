@@ -21,7 +21,8 @@ import {
   X,
   MapPin,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Clock
 } from 'lucide-react';
 import { MENU_ITEMS, type MenuItem } from '../../data/mockData';
 import { type UserProfile } from '../ui/AuthModal';
@@ -861,6 +862,10 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                         <p className="text-white pt-1">Unidade {pickupLocation}</p>
                         <p className="text-offWhite/45 text-[10px] font-medium leading-tight">
                           Endereço: {pickupLocation === 'Presidente Vargas' ? 'Av. Pres. Vargas, 840' : 'Av. Dr. Flávio Rocha, 500'}
+                        </p>
+                        <p className="text-[#8ac926] text-[10px] font-bold mt-1.5 flex items-center gap-1.5">
+                          <Clock size={12} className="stroke-[2.5]" />
+                          <span>Fica pronto em 40min ou menos para buscar!</span>
                         </p>
                       </div>
                     )}

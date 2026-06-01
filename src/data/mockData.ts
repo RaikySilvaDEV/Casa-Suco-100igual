@@ -90,7 +90,7 @@ export const MENU_ITEMS: MenuItem[] = [
     category: "sucos",
     tag: "Mais Vendido",
     ingredients: ["Laranja", "Morango", "Abacaxi", "Hortelã"],
-    image: "https://img.restaurantguru.com/r3a4-juice-100-Igual.jpg"
+    image: "https://images.unsplash.com/photo-1556881286-fc6915169721?q=80&w=600&auto=format&fit=crop"
   },
   {
     id: "suco-verde-detox",
@@ -179,7 +179,7 @@ export const MENU_ITEMS: MenuItem[] = [
     category: "acai",
     tag: "O Melhor da Cidade",
     ingredients: ["Açaí Premium", "Banana", "Morango", "Granola", "Leite Condensado"],
-    image: "https://img.restaurantguru.com/r5d1-acai-100-Igual.jpg"
+    image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=600&auto=format&fit=crop"
   },
   {
     id: "acai-copo-express",
@@ -200,7 +200,7 @@ export const MENU_ITEMS: MenuItem[] = [
     category: "lanches",
     tag: "O Lendário",
     ingredients: ["Pão de Hambúrguer", "Filé Mignon", "Queijo Prato", "Presunto", "Salada", "Maionese Verde"],
-    image: "https://img.restaurantguru.com/rcf2-burger-100-Igual.jpg"
+    image: "https://images.unsplash.com/photo-1534790566855-4cb788d389ec?q=80&w=600&auto=format&fit=crop"
   },
   {
     id: "x-bolota-premium",
@@ -280,7 +280,7 @@ export const MENU_ITEMS: MenuItem[] = [
     category: "porcoes",
     tag: "Mais Pedida",
     ingredients: ["Filés de Tilápia", "Limão Cravo", "Molho Tártaro"],
-    image: "https://img.restaurantguru.com/r7d3-tilapia-100-Igual.jpg"
+    image: "https://images.unsplash.com/photo-1534939561126-855b8675edd7?q=80&w=600&auto=format&fit=crop"
   },
   {
     id: "batata-suprema-cheddar-bacon",
@@ -396,7 +396,7 @@ export const UNITS: UnitInfo[] = [
     mapsUrl: "https://maps.google.com/?q=Av.+Presidente+Vargas,+840+-+Cidade+Nova,+Franca+-+SP",
     hasDriveThru: true,
     hasKidsSpace: false,
-    image: "https://img.restaurantguru.com/r1df-design-100-Igual.jpg", // Real storefront
+    image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800&auto=format&fit=crop", // Real storefront
     accentColor: "from-orangeCitrus via-orangeGold to-darkCard"
   },
   {

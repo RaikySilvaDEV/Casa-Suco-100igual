@@ -25,7 +25,7 @@ export const Delivery: React.FC = () => {
     {
       id: 'retirada',
       title: 'Retirada no Local',
-      description: 'Retire seu pedido e ganhe descontos',
+      description: 'Pronta em 40min ou menos para buscar!',
       icon: (props: React.SVGProps<SVGSVGElement>) => <ShoppingBag {...props} />
     },
     {

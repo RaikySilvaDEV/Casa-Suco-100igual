@@ -83,9 +83,8 @@ export const Featured: React.FC = () => {
                 whileHover={{ scale: 1.05, rotate: 1 }}
                 transition={{ type: 'spring' as const, stiffness: 200, damping: 12 }}
               >
-                {/* The actual real photo of Suco 100 Igual */}
                 <img
-                  src="https://img.restaurantguru.com/r3a4-juice-100-Igual.jpg"
+                  src="https://images.unsplash.com/photo-1556881286-fc6915169721?q=80&w=600&auto=format&fit=crop"
                   alt="Suco Especial 100 Igual"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   loading="lazy"

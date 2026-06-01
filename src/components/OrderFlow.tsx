@@ -33,11 +33,11 @@ const STEPS = [
   {
     id: 4,
     title: 'Receba ou Retire',
-    description: 'Decida se prefere que nosso motoboy entregue super rápido na sua casa ou se prefere passar na unidade para pegar direto no balcão ou no drive-thru sem descer do carro.',
+    description: 'Decida se prefere que nosso motoboy entregue super rápido na sua casa ou se prefere passar na unidade para pegar direto no balcão ou no drive-thru sem descer do carro (bebidas prontas em 40min ou menos!).',
     icon: Truck,
     color: 'from-emerald-500 to-orangeCitrus',
     badge: 'Passo 4',
-    tip: 'Drive-thru disponível na Pres. Vargas!'
+    tip: 'Bebidas ficam prontas em até 40 minutos para buscar!'
   },
 ];
 
