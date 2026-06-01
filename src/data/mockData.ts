@@ -416,23 +416,23 @@ export const UNITS: UnitInfo[] = [
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: "t1",
-    name: "Mariana Silva",
-    role: "Excelente! Tudo muito fresco e saboroso.",
-    content: "Os sucos são frescos e saborosos.",
+    name: "Dr. Marcos Pedrosa",
+    role: "Cliente fiel desde 2002 (Unidade Centro/Vargas)",
+    content: "Frequento a 100Igual desde o comecinho. O Suco 100 Igual deles com laranja, morango e hortelã é inigualável, insuperável! O drive-thru da Cidade Nova é extremamente prático quando estou na correria entre os plantões.",
     rating: 5
   },
   {
     id: "t2",
-    name: "João Pedro",
-    role: "Melhor da cidade!",
-    content: "A melhor casa de... atendimento e...",
+    name: "Aline & Família",
+    role: "Moradora da Vila Imperador (Fã da Unidade Paulo VI)",
+    content: "Domingo à tarde com as crianças é lei ir na Paulo VI! O espaço kids deles é excelente, muito amplo e seguro. E enquanto as crianças brincam, a gente aproveita as porções de chapa gigantescas de Ancho e aquele Chopp estupidamente gelado. Nota 10!",
     rating: 5
   },
   {
     id: "t3",
-    name: "Ana Paula",
-    role: "Melhor açaí!",
-    content: "Açaí delicioso e... e combos perfeitos!",
+    name: "Tiago 'Bolota' Santos",
+    role: "Atleta de Franca (Cliente do Madrugada)",
+    content: "O X-Bolota de vocês com aquele hambúrguer suculento de 160g e a maionese verde caseira é o melhor pós-treino ou pós-jogo que existe em Franca! E o açaí supremo deles com banana e granola na tigela é o mais denso da cidade, não tem mistura de xarope artificial.",
     rating: 5
   }
 ];
@@ -483,4 +483,23 @@ export const HIGHLIGHT_ITEMS: MenuItem[] = [
     ingredients: ["Maracujá"],
     image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?q=80&w=600&auto=format&fit=crop"
   }
+];
+
+export interface NeighborhoodDelivery {
+  name: string;
+  fee: number;
+}
+
+export const FRANCA_NEIGHBORHOODS: NeighborhoodDelivery[] = [
+  { name: 'Centro', fee: 4.50 },
+  { name: 'Cidade Nova', fee: 5.00 },
+  { name: 'Estação', fee: 6.00 },
+  { name: 'Paulo VI / Dr. Flávio Rocha', fee: 5.50 },
+  { name: 'Jardim Aeroporto', fee: 8.00 },
+  { name: 'Jardim Paulistano', fee: 6.50 },
+  { name: 'Jardim Leporace', fee: 9.00 },
+  { name: 'Parque Universitário', fee: 8.50 },
+  { name: 'Vila Imperador', fee: 5.50 },
+  { name: 'Jardim Noêmia', fee: 7.00 },
+  { name: 'Outro Bairro (Franca-SP)', fee: 7.50 }
 ];

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Phone, MapPin, CreditCard, Landmark, CheckCircle2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { FRANCA_NEIGHBORHOODS } from '../../data/mockData';
 
 export interface UserProfile {
   name: string;
@@ -29,7 +30,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const [name, setName] = useState('');
   const [street, setStreet] = useState('');
   const [number, setNumber] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
+  const [neighborhood, setNeighborhood] = useState('Cidade Nova');
   const [reference, setReference] = useState('');
   const [city, setCity] = useState('Franca-SP');
   const [defaultPayment, setDefaultPayment] = useState<UserProfile['defaultPayment']>('pix');
@@ -42,7 +43,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       setName('');
       setStreet('');
       setNumber('');
-      setNeighborhood('');
+      setNeighborhood('Cidade Nova');
       setReference('');
       setCity('Franca-SP');
       setDefaultPayment('pix');
@@ -334,19 +335,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Neighborhood */}
+                    {/* Neighborhood Dropdown select */}
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-offWhite/45 mb-1.5">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#8ac926] mb-1.5">
                         Bairro *
                       </label>
-                      <input
-                        type="text"
+                      <select
                         required
-                        placeholder="Ex: Cidade Nova"
                         value={neighborhood}
                         onChange={(e) => setNeighborhood(e.target.value)}
-                        className="w-full bg-[#161616] border border-white/5 rounded-2xl py-3 px-4 text-xs text-white placeholder-offWhite/35 focus:outline-none focus:border-[#8ac926]/40 transition-colors"
-                      />
+                        className="w-full bg-[#161616] border border-white/5 rounded-2xl py-3 px-4 text-xs text-white focus:outline-none focus:border-[#8ac926]/40 transition-colors cursor-pointer"
+                      >
+                        {FRANCA_NEIGHBORHOODS.map((n) => (
+                          <option key={n.name} value={n.name} className="bg-[#0d0d0d]">
+                            {n.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     {/* Reference Point */}

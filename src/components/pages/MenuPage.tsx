@@ -24,7 +24,7 @@ import {
   AlertTriangle,
   Clock
 } from 'lucide-react';
-import { MENU_ITEMS, type MenuItem } from '../../data/mockData';
+import { MENU_ITEMS, FRANCA_NEIGHBORHOODS, type MenuItem } from '../../data/mockData';
 import { type UserProfile } from '../ui/AuthModal';
 
 interface MenuPageProps {
@@ -82,11 +82,13 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'money' | 'credit' | 'debit'>('pix');
   const [changeFor, setChangeFor] = useState('');
+  const [currentNeighborhood, setCurrentNeighborhood] = useState('Cidade Nova');
 
-  // Auto-sync preferred payment method from user profile
+  // Auto-sync preferred payment method and neighborhood from user profile
   useEffect(() => {
     if (user) {
       setPaymentMethod(user.defaultPayment || 'pix');
+      setCurrentNeighborhood(user.neighborhood || 'Cidade Nova');
     }
   }, [user, checkoutStep]);
 
@@ -188,7 +190,12 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
   }, [cart]);
 
   // Delivery Calculations
-  const deliveryFee = deliveryType === 'delivery' ? 5.00 : 0.00;
+  const deliveryFee = useMemo(() => {
+    if (deliveryType !== 'delivery') return 0.00;
+    const match = FRANCA_NEIGHBORHOODS.find(n => n.name.toLowerCase() === currentNeighborhood.toLowerCase());
+    return match ? match.fee : 7.50; // Default fallback fee is R$ 7,50
+  }, [deliveryType, currentNeighborhood]);
+
   const grandTotal = cartTotal + deliveryFee;
 
   // Checkout via WhatsApp (ERP Structured Ticket)
@@ -203,7 +210,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     
     if (deliveryType === 'delivery') {
       message += `📍 *ENDEREÇO:* ${user.street}, ${user.number}\n`;
-      message += `🏡 *BAIRRO:* ${user.neighborhood}\n`;
+      message += `🏡 *BAIRRO:* ${currentNeighborhood}\n`;
       if (user.reference) {
         message += `🎯 *REF:* ${user.reference}\n`;
       }
@@ -840,15 +847,33 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                     {/* Method Conditionals */}
                     {deliveryType === 'delivery' ? (
                       /* Address block */
-                      <div className="p-4 bg-[#111111] border border-white/5 rounded-2xl space-y-2 text-xs font-semibold leading-relaxed">
+                      <div className="p-4 bg-[#111111] border border-white/5 rounded-2xl space-y-3 text-xs font-semibold leading-relaxed">
                         <div className="flex items-center justify-between">
                           <span className="block text-[9px] font-black uppercase tracking-widest text-offWhite/45">
                             Local de Entrega
                           </span>
                           <span className="text-[10px] text-[#8ac926] font-bold uppercase">Motoboy Express</span>
                         </div>
-                        <p className="text-white pt-1">{user.street}, nº {user.number} - {user.neighborhood}</p>
+                        <p className="text-white pt-0.5">{user.street}, nº {user.number}</p>
                         {user.reference && <p className="text-offWhite/50 text-[11px]">Ref: {user.reference}</p>}
+                        
+                        {/* Interactive Franca-SP Neighborhood selector */}
+                        <div className="pt-2 border-t border-white/5 space-y-1.5">
+                          <label className="block text-[8px] font-black uppercase tracking-wider text-[#8ac926]">
+                            Bairro de Franca-SP (Taxa Dinâmica):
+                          </label>
+                          <select
+                            value={currentNeighborhood}
+                            onChange={(e) => setCurrentNeighborhood(e.target.value)}
+                            className="w-full bg-[#161616] border border-white/10 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-[#8ac926]/40 cursor-pointer"
+                          >
+                            {FRANCA_NEIGHBORHOODS.map((n) => (
+                              <option key={n.name} value={n.name} className="bg-[#0d0d0d]">
+                                {n.name} — R$ {n.fee.toFixed(2).replace('.', ',')}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     ) : (
                       /* Pickup Confirmed Branch (Sets back to selection chosen in Step 1) */
