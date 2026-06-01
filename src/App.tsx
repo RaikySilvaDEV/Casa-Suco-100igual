@@ -201,7 +201,7 @@ export const App: React.FC = () => {
       </AnimatePresence>
 
       {/* Global Footer (CTA.tsx) */}
-      <CTA />
+      <CTA onPageChange={handlePageChange} />
 
       {/* Authentication Modal Dialog */}
       <AuthModal
