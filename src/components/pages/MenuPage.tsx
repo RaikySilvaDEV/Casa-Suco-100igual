@@ -202,25 +202,38 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
   const handleCheckout = () => {
     if (cart.length === 0 || !user) return;
 
+    // Emojis created at runtime using String.fromCodePoint to guarantee no text encoding corruption
+    const emojiUser = String.fromCodePoint(0x1F464);   // 👤
+    const emojiPhone = String.fromCodePoint(0x1F4DE);  // 📞
+    const emojiMoto = String.fromCodePoint(0x1F3CD);   // 🏍
+    const emojiPin = String.fromCodePoint(0x1F4CD);    // 📍
+    const emojiHouse = String.fromCodePoint(0x1F3E1);  // 🏡
+    const emojiTarget = String.fromCodePoint(0x1F3AF); // 🎯
+    const emojiCity = String.fromCodePoint(0x1F303);   // 🏙
+    const emojiStore = String.fromCodePoint(0x1F3E2);  // 🏢
+    const emojiBag = String.fromCodePoint(0x1F6CD);    // 🛍
+    const emojiCard = String.fromCodePoint(0x1F4B3);   // 💳
+    const emojiCash = String.fromCodePoint(0x1F4B5);   // 💵
+
     let message = `*NOVO PEDIDO - 100IGUAL CASA DE SUCOS*\n`;
     message += `-------------------------------------------\n`;
-    message += `\u{1F464} *CLIENTE:* ${user.name}\n`;
-    message += `\u{1F4DE} *TELEFONE:* ${user.phone}\n`;
-    message += `\u{1F3CD} *TIPO:* ${deliveryType === 'delivery' ? 'Entrega Residencial' : 'Retirada na Loja'}\n`;
+    message += `${emojiUser} *CLIENTE:* ${user.name}\n`;
+    message += `${emojiPhone} *TELEFONE:* ${user.phone}\n`;
+    message += `${emojiMoto} *TIPO:* ${deliveryType === 'delivery' ? 'Entrega Residencial' : 'Retirada na Loja'}\n`;
     
     if (deliveryType === 'delivery') {
-      message += `\u{1F4CD} *ENDEREÇO:* ${user.street}, ${user.number}\n`;
-      message += `\u{1F3E1} *BAIRRO:* ${currentNeighborhood}\n`;
+      message += `${emojiPin} *ENDEREÇO:* ${user.street}, ${user.number}\n`;
+      message += `${emojiHouse} *BAIRRO:* ${currentNeighborhood}\n`;
       if (user.reference) {
-        message += `\u{1F3AF} *REF:* ${user.reference}\n`;
+        message += `${emojiTarget} *REF:* ${user.reference}\n`;
       }
-      message += `\u{1F303} *CIDADE:* ${user.city}\n`;
+      message += `${emojiCity} *CIDADE:* ${user.city}\n`;
     } else {
-      message += `\u{1F3E2} *RETIRAR EM:* Unidade ${pickupLocation}\n`;
+      message += `${emojiStore} *RETIRAR EM:* Unidade ${pickupLocation}\n`;
     }
     
     message += `-------------------------------------------\n`;
-    message += `\u{1F6CD} *ITENS DO PEDIDO:*\n`;
+    message += `${emojiBag} *ITENS DO PEDIDO:*\n`;
 
     cart.forEach((item) => {
       const priceVal = parseFloat(item.product.price.replace('R$ ', '').replace(',', '.'));
@@ -247,9 +260,9 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
       debit: 'Cartão de Débito (na entrega)'
     };
     
-    message += `\u{1F4B3} *FORMA DE PAGAMENTO:* ${payMethodNames[paymentMethod]}\n`;
+    message += `${emojiCard} *FORMA DE PAGAMENTO:* ${payMethodNames[paymentMethod]}\n`;
     message += `-------------------------------------------\n`;
-    message += `\u{1F4B5} *RESUMO FINANCEIRO:*\n`;
+    message += `${emojiCash} *RESUMO FINANCEIRO:*\n`;
     message += `• Subtotal Produtos: R$ ${cartTotal.toFixed(2).replace('.', ',')}\n`;
     if (deliveryType === 'delivery') {
       message += `• Taxa de Entrega: R$ ${deliveryFee.toFixed(2).replace('.', ',')}\n`;
@@ -259,7 +272,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     message += `_Pedido finalizado via site. Aguardamos sua confirmação e preparo!_`;
 
     const encodedText = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/551637215494?text=${encodedText}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=551637215494&text=${encodedText}`;
     window.open(whatsappUrl, '_blank');
   };
 
