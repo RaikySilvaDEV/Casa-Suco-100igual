@@ -2,58 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
-const NAV_LINKS = [
-  { label: 'Início', href: '#inicio' },
-  { label: 'Cardápio', href: '#cardapio' },
-  { label: 'Combos', href: '#cardapio' },
-  { label: 'Sobre Nós', href: '#sobre' },
-  { label: 'Benefícios', href: '#sobre' },
-  { label: 'Lojas', href: '#sobre' },
-  { label: 'Contato', href: '#delivery' },
-];
+export type PageName = 'home' | 'menu' | 'about' | 'stores' | 'benefits' | 'contact';
 
-export const Navbar: React.FC = () => {
+const NAV_LINKS = [
+  { label: 'Início', page: 'home' },
+  { label: 'Cardápio', page: 'menu' },
+  { label: 'Sobre Nós', page: 'about' },
+  { label: 'Benefícios', page: 'benefits' },
+  { label: 'Lojas', page: 'stores' },
+  { label: 'Contato', page: 'contact' },
+] as const;
+
+interface NavbarProps {
+  currentPage: PageName;
+  onPageChange: (page: PageName) => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState('inicio');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
-      
-      const sections = NAV_LINKS.map(link => link.href.substring(1));
-      const scrollPosition = window.scrollY + 120;
-
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setActiveSection(href.substring(1));
-    setIsMobileMenuOpen(false);
-    
-    const target = document.querySelector(href);
-    if (target) {
-      window.scrollTo({
-        top: target.getBoundingClientRect().top + window.scrollY - 80,
-        behavior: 'smooth',
-      });
-    }
-  };
 
   return (
     <>
@@ -68,31 +44,37 @@ export const Navbar: React.FC = () => {
         transition={{ duration: 0.6 }}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          {/* Brand Logo (Screenshot Style) */}
-          <a
-            href="#inicio"
-            onClick={(e) => handleLinkClick(e, '#inicio')}
-            className="flex flex-col text-left group cursor-pointer"
+          {/* Brand Logo (Animated Video) */}
+          <button
+            onClick={() => {
+              onPageChange('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center cursor-pointer bg-transparent border-none outline-none group"
           >
-            <span className="text-xl md:text-2xl font-black tracking-tight text-white group-hover:text-[#8ac926] transition-colors leading-none">
-              100<span className="text-[#8ac926]">IGUAL</span>
-            </span>
-            <span className="text-[8px] tracking-[0.18em] text-[#8ac926] uppercase font-bold mt-1 group-hover:text-white transition-colors">
-              CASA DE SUCOS
-            </span>
-          </a>
+            <video
+              src="/Logo_animation_for_100_IGUAL_202606011448.mp4"
+              className="h-10 md:h-12 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform duration-300"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+            />
+          </button>
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map((link) => {
-              const sectionId = link.href.substring(1);
-              const isActive = activeSection === sectionId;
+              const isActive = currentPage === link.page;
               return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => handleLinkClick(e, link.href)}
-                  className={`relative text-sm font-semibold tracking-wide transition-colors duration-300 ${
+                <button
+                  key={link.page}
+                  onClick={() => {
+                    onPageChange(link.page);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`relative text-sm font-semibold tracking-wide transition-colors duration-300 cursor-pointer bg-transparent border-none outline-none pb-1 ${
                     isActive ? 'text-white' : 'text-offWhite/65 hover:text-white'
                   }`}
                 >
@@ -104,14 +86,14 @@ export const Navbar: React.FC = () => {
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                </a>
+                </button>
               );
             })}
           </div>
 
           {/* Pedir no WhatsApp Green Pill Button */}
           <a
-            href="https://wa.me/5516999999999"
+            href="https://wa.me/551637215494"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden lg:flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#4CAF50] hover:bg-[#43A047] text-white font-extrabold text-xs transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_5px_15px_rgba(76,175,80,0.2)]"
@@ -126,7 +108,7 @@ export const Navbar: React.FC = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-offWhite transition-colors"
+            className="lg:hidden p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-offWhite transition-colors cursor-pointer"
             aria-label="Toggle Menu"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -146,14 +128,16 @@ export const Navbar: React.FC = () => {
           >
             <div className="flex flex-col items-center gap-6 text-center">
               {NAV_LINKS.map((link, idx) => {
-                const sectionId = link.href.substring(1);
-                const isActive = activeSection === sectionId;
+                const isActive = currentPage === link.page;
                 return (
-                  <motion.a
-                    key={link.href}
-                    href={link.href}
-                    onClick={(e) => handleLinkClick(e, link.href)}
-                    className={`text-2xl font-bold tracking-wide transition-colors ${
+                  <motion.button
+                    key={link.page}
+                    onClick={() => {
+                      onPageChange(link.page);
+                      setIsMobileMenuOpen(false);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={`text-2xl font-bold tracking-wide transition-colors cursor-pointer bg-transparent border-none outline-none ${
                       isActive ? 'text-[#8ac926]' : 'text-offWhite hover:text-white'
                     }`}
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -161,15 +145,15 @@ export const Navbar: React.FC = () => {
                     transition={{ delay: idx * 0.05 }}
                   >
                     {link.label}
-                  </motion.a>
+                  </motion.button>
                 );
               })}
               
               <motion.a
-                href="https://wa.me/5516999999999"
+                href="https://wa.me/551637215494"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 flex items-center gap-2 px-6 py-3 rounded-full bg-[#4CAF50] text-white font-extrabold hover:scale-105 active:scale-95 shadow-[0_5px_15px_rgba(76,175,80,0.2)] transition-all duration-300"
+                className="mt-6 flex items-center gap-2 px-6 py-3 rounded-xl bg-[#4CAF50] text-white font-extrabold hover:scale-105 active:scale-95 shadow-[0_5px_15px_rgba(76,175,80,0.2)] transition-all duration-300"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
