@@ -204,23 +204,23 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
 
     let message = `*NOVO PEDIDO - 100IGUAL CASA DE SUCOS*\n`;
     message += `-------------------------------------------\n`;
-    message += `👤 *CLIENTE:* ${user.name}\n`;
-    message += `📞 *TELEFONE:* ${user.phone}\n`;
-    message += `🏍 *TIPO:* ${deliveryType === 'delivery' ? 'Entrega Residencial' : 'Retirada na Loja'}\n`;
+    message += `\u{1F464} *CLIENTE:* ${user.name}\n`;
+    message += `\u{1F4DE} *TELEFONE:* ${user.phone}\n`;
+    message += `\u{1F3CD} *TIPO:* ${deliveryType === 'delivery' ? 'Entrega Residencial' : 'Retirada na Loja'}\n`;
     
     if (deliveryType === 'delivery') {
-      message += `📍 *ENDEREÇO:* ${user.street}, ${user.number}\n`;
-      message += `🏡 *BAIRRO:* ${currentNeighborhood}\n`;
+      message += `\u{1F4CD} *ENDEREÇO:* ${user.street}, ${user.number}\n`;
+      message += `\u{1F3E1} *BAIRRO:* ${currentNeighborhood}\n`;
       if (user.reference) {
-        message += `🎯 *REF:* ${user.reference}\n`;
+        message += `\u{1F3AF} *REF:* ${user.reference}\n`;
       }
-      message += `🏙 *CIDADE:* ${user.city}\n`;
+      message += `\u{1F303} *CIDADE:* ${user.city}\n`;
     } else {
-      message += `🏢 *RETIRAR EM:* Unidade ${pickupLocation}\n`;
+      message += `\u{1F3E2} *RETIRAR EM:* Unidade ${pickupLocation}\n`;
     }
     
     message += `-------------------------------------------\n`;
-    message += `🛍 *ITENS DO PEDIDO:*\n`;
+    message += `\u{1F6CD} *ITENS DO PEDIDO:*\n`;
 
     cart.forEach((item) => {
       const priceVal = parseFloat(item.product.price.replace('R$ ', '').replace(',', '.'));
@@ -247,9 +247,9 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
       debit: 'Cartão de Débito (na entrega)'
     };
     
-    message += `💳 *FORMA DE PAGAMENTO:* ${payMethodNames[paymentMethod]}\n`;
+    message += `\u{1F4B3} *FORMA DE PAGAMENTO:* ${payMethodNames[paymentMethod]}\n`;
     message += `-------------------------------------------\n`;
-    message += `💵 *RESUMO FINANCEIRO:*\n`;
+    message += `\u{1F4B5} *RESUMO FINANCEIRO:*\n`;
     message += `• Subtotal Produtos: R$ ${cartTotal.toFixed(2).replace('.', ',')}\n`;
     if (deliveryType === 'delivery') {
       message += `• Taxa de Entrega: R$ ${deliveryFee.toFixed(2).replace('.', ',')}\n`;
