@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Navbar, type PageName } from './components/Navbar';
+
+// Core Home page sections
 import { Hero } from './components/Hero';
+import { Featured } from './components/Featured';
+import { Promo } from './components/Promo';
 import { Menu } from './components/Menu';
+import { OrderFlow } from './components/OrderFlow';
 import { Timeline } from './components/Timeline';
+import { Units } from './components/Units';
+import { Moments } from './components/Moments';
+import { Testimonials } from './components/Testimonials';
 import { Delivery } from './components/Delivery';
 import { CTA } from './components/CTA';
 
@@ -95,16 +103,34 @@ export const App: React.FC = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Hero Section */}
+            {/* 1. Cinematic Hero Section */}
             <Hero />
 
-            {/* Sobre Nós Section (Timeline.tsx) */}
-            <Timeline />
+            {/* 2. Premium Core Values & Highlights Grid */}
+            <Featured />
 
-            {/* Destaques da Casa (Menu.tsx) */}
+            {/* 3. Limited-Time Live Countdown Campaigns */}
+            <Promo />
+
+            {/* 4. Best Selling Menu Highlights */}
             <Menu />
 
-            {/* Info Strip (Delivery.tsx) */}
+            {/* 5. Simple 4-Step Interactive Order Flow */}
+            <OrderFlow />
+
+            {/* 6. Company Timeline & Local Sourcing Story */}
+            <Timeline />
+
+            {/* 7. Franchise Branch Locations Finder */}
+            <Units />
+
+            {/* 8. Instagram Style Social Photographic Moments */}
+            <Moments />
+
+            {/* 9. Verified Customer Testimonials Carousel */}
+            <Testimonials />
+
+            {/* 10. Logistics & Speed Strip */}
             <Delivery />
           </motion.div>
         )}
