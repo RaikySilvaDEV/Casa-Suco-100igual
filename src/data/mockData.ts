@@ -300,6 +300,25 @@ export const MENU_ITEMS: MenuItem[] = [
     ingredients: ["Linguiça Calabresa", "Cebola fatiada", "Manteiga", "Pão Francês"],
     image: "https://images.unsplash.com/photo-1534938665420-4193effeabd4?q=80&w=600&auto=format&fit=crop"
   },
+  {
+    id: "porcao-frango-crocante",
+    name: "Porção de Frango Crocante",
+    description: "Tiras suculentas de filé de peito de frango selecionadas, empanadas em uma crosta de farinha Panko e fritas na hora. Acompanha molho rosé clássico da casa.",
+    price: "R$ 34,90",
+    category: "porcoes",
+    ingredients: ["Filé de Peito de Frango", "Farinha Panko", "Molho Rosé"],
+    image: "https://images.unsplash.com/photo-1562967914-608f82629710?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: "porcao-bife-ancho-chapa",
+    name: "Porção de Bife Ancho Grelhado",
+    description: "Corte nobre portenho de bife ancho bovino premium, fatiado e grelhado na chapa de ferro quente com rodelas de cebola na manteiga. Acompanha fatias de pão francês e molho chimichurri fresco.",
+    price: "R$ 52,90",
+    category: "porcoes",
+    tag: "Corte Nobre",
+    ingredients: ["Bife Ancho Premium", "Cebola", "Manteiga", "Pão Francês", "Molho Chimichurri"],
+    image: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?q=80&w=600&auto=format&fit=crop"
+  },
 
   // Category 7: Sobremesas
   {
