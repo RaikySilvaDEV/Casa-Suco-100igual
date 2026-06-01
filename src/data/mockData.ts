@@ -100,7 +100,7 @@ export const MENU_ITEMS: MenuItem[] = [
     category: "sucos",
     tag: "Saudável",
     ingredients: ["Couve", "Limão", "Gengibre", "Maçã Verde", "Água de Coco"],
-    image: "https://images.unsplash.com/photo-1610970881699-44a5587caaec?q=80&w=600&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=600&auto=format&fit=crop"
   },
   {
     id: "suco-morango-ninho",
@@ -454,7 +454,7 @@ export const HIGHLIGHT_ITEMS: MenuItem[] = [
     price: "R$ 12,90",
     category: "sucos",
     ingredients: ["Couve", "Abacaxi", "Limão", "Maçã", "Hortelã"],
-    image: "https://images.unsplash.com/photo-1610970881699-44a5587caaec?q=80&w=600&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=600&auto=format&fit=crop"
   },
   {
     id: "acai-especial-destaque",

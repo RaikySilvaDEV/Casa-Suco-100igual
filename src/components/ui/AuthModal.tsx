@@ -18,9 +18,10 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: (profile: UserProfile) => void;
+  user?: UserProfile | null;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess, user }) => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [phoneInput, setPhoneInput] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -39,16 +40,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     if (isOpen) {
       setErrorMsg(null);
       setSuccessMsg(null);
-      setPhoneInput('');
-      setName('');
-      setStreet('');
-      setNumber('');
-      setNeighborhood('Cidade Nova');
-      setReference('');
-      setCity('Franca-SP');
-      setDefaultPayment('pix');
+      
+      if (user) {
+        // Edit Profile Mode: Pre-fill all fields and switch directly to register tab
+        setActiveTab('register');
+        setPhoneInput(user.phone || '');
+        setName(user.name || '');
+        setStreet(user.street || '');
+        setNumber(user.number || '');
+        setNeighborhood(user.neighborhood || 'Cidade Nova');
+        setReference(user.reference || '');
+        setCity(user.city || 'Franca-SP');
+        setDefaultPayment(user.defaultPayment || 'pix');
+      } else {
+        // Fresh Login / Register fresh mode
+        setActiveTab('login');
+        setPhoneInput('');
+        setName('');
+        setStreet('');
+        setNumber('');
+        setNeighborhood('Cidade Nova');
+        setReference('');
+        setCity('Franca-SP');
+        setDefaultPayment('pix');
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   const handlePhoneLookup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,7 +173,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
               <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6">
                 <div className="flex items-center gap-2 text-[#8ac926]">
                   <ShieldCheck size={24} className="stroke-[2]" />
-                  <h3 className="font-black text-lg text-white uppercase tracking-tight">Sua Conta 100Igual</h3>
+                  <h3 className="font-black text-lg text-white uppercase tracking-tight">
+                    {user ? 'Editar Perfil / Endereço' : 'Sua Conta 100Igual'}
+                  </h3>
                 </div>
                 <button
                   onClick={onClose}
@@ -166,31 +185,33 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 </button>
               </div>
 
-              {/* Tabs Switcher */}
-              <div className="flex bg-[#161616] p-1.5 rounded-2xl gap-1 mb-6">
-                <button
-                  type="button"
-                  onClick={() => { setActiveTab('login'); setErrorMsg(null); }}
-                  className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                    activeTab === 'login'
-                      ? 'bg-[#8ac926] text-black shadow-lg shadow-[#8ac926]/10'
-                      : 'text-offWhite/65 hover:text-white bg-transparent'
-                  }`}
-                >
-                  Entrar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setActiveTab('register'); setErrorMsg(null); }}
-                  className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                    activeTab === 'register'
-                      ? 'bg-[#8ac926] text-black shadow-lg shadow-[#8ac926]/10'
-                      : 'text-offWhite/65 hover:text-white bg-transparent'
-                  }`}
-                >
-                  Criar Conta
-                </button>
-              </div>
+              {/* Tabs Switcher - Only display if user is not already logged in */}
+              {!user && (
+                <div className="flex bg-[#161616] p-1.5 rounded-2xl gap-1 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('login'); setErrorMsg(null); }}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      activeTab === 'login'
+                        ? 'bg-[#8ac926] text-black shadow-lg shadow-[#8ac926]/10'
+                        : 'text-offWhite/65 hover:text-white bg-transparent'
+                    }`}
+                  >
+                    Entrar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('register'); setErrorMsg(null); }}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      activeTab === 'register'
+                        ? 'bg-[#8ac926] text-black shadow-lg shadow-[#8ac926]/10'
+                        : 'text-offWhite/65 hover:text-white bg-transparent'
+                    }`}
+                  >
+                    Criar Conta
+                  </button>
+                </div>
+              )}
 
               {/* Status Messages */}
               <AnimatePresence mode="wait">
@@ -410,7 +431,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     type="submit"
                     className="w-full mt-4 flex items-center justify-center py-4 rounded-2xl bg-[#8ac926] hover:bg-[#8ac926]/90 text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-[#8ac926]/10 transition-all cursor-pointer"
                   >
-                    Salvar Dados e Conectar
+                    {user ? 'Salvar Alterações' : 'Salvar Dados e Conectar'}
                   </button>
                 </form>
               )}

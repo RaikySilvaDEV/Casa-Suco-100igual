@@ -104,7 +104,7 @@ export const App: React.FC = () => {
             transition={{ duration: 0.5 }}
           >
             {/* 1. Cinematic Hero Section */}
-            <Hero />
+            <Hero onNavigate={handlePageChange} />
 
             {/* 2. Premium Core Values & Highlights Grid */}
             <Featured />

@@ -3,7 +3,11 @@ import { motion } from 'framer-motion';
 import { BookOpen, Leaf, Zap, Heart, Flame } from 'lucide-react';
 import { AuroraBackground } from './ui/AuroraBackground';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  onNavigate?: (page: 'home' | 'menu' | 'about' | 'stores' | 'benefits' | 'contact') => void;
+}
+
+export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
   const heroRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasLeftViewportRef = useRef(false);
@@ -35,16 +39,7 @@ export const Hero: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    e.preventDefault();
-    const target = document.querySelector(targetId);
-    if (target) {
-      window.scrollTo({
-        top: target.getBoundingClientRect().top + window.scrollY - 80,
-        behavior: 'smooth',
-      });
-    }
-  };
+
 
   return (
     <section
@@ -182,14 +177,17 @@ export const Hero: React.FC = () => {
               </a>
 
               {/* Cardapio Button (Outline, Right) */}
-              <a
-                href="#cardapio"
-                onClick={(e) => handleCtaClick(e, '#cardapio')}
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-[#76a827] text-white font-black text-xs md:text-sm uppercase bg-transparent hover:bg-[#76a827]/10 hover:scale-105 active:scale-95 transition-all duration-300"
+              <button
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('menu');
+                  }
+                }}
+                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-[#76a827] text-white font-black text-xs md:text-sm uppercase bg-transparent hover:bg-[#76a827]/10 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
               >
                 <BookOpen size={16} className="text-[#8ac926]" />
                 <span>Ver Cardápio</span>
-              </a>
+              </button>
             </motion.div>
 
             {/* Horizontal Stats Row directly below the buttons */}
