@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Raiky Silva",
+    "phone": "(16) 99999-9999",
+    "street": "Rua Corumba",
+    "number": "371",
+    "neighborhood": "Pedregulho",
+    "reference": "Perto da padaria central",
+    "city": "Franca-SP",
+    "defaultPayment": "pix"
+  },
+  {
+    "name": "Délcio Gestor",
+    "phone": "(16) 99100-1000",
+    "street": "Av. Presidente Vargas",
+    "number": "840",
+    "neighborhood": "Cidade Nova",
+    "reference": "100Igual Casa de Sucos",
+    "city": "Franca-SP",
+    "defaultPayment": "money"
+  },
+  {
+    "name": "Dr. Marcos Pedrosa",
+    "phone": "(16) 99200-2002",
+    "street": "Rua Major Claudiano",
+    "number": "1200",
+    "neighborhood": "Centro",
+    "reference": "Consultório 12, Bloco A",
+    "city": "Franca-SP",
+    "defaultPayment": "credit"
+  }
+]

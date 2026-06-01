@@ -22,8 +22,8 @@ import { StoresPage } from './components/pages/StoresPage';
 import { BenefitsPage } from './components/pages/BenefitsPage';
 import { ContactPage } from './components/pages/ContactPage';
 
-// Auth Dialog Components
 import { AuthModal, type UserProfile } from './components/ui/AuthModal';
+import mockUsers from './data/mockUsers.json';
 
 export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageName>('home');
@@ -41,6 +41,12 @@ export const App: React.FC = () => {
   // Load user profile on mount
   useEffect(() => {
     window.history.scrollRestoration = 'manual';
+    
+    // Initialize mock database users if not present in localStorage
+    const savedRegistry = localStorage.getItem('100igual_registered_profiles');
+    if (!savedRegistry) {
+      localStorage.setItem('100igual_registered_profiles', JSON.stringify(mockUsers));
+    }
     
     const savedUser = localStorage.getItem('100igual_user_profile');
     if (savedUser) {
