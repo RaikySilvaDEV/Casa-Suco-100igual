@@ -38,32 +38,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
 
   useEffect(() => {
     if (isOpen) {
-      setErrorMsg(null);
-      setSuccessMsg(null);
-      
-      if (user) {
-        // Edit Profile Mode: Pre-fill all fields and switch directly to register tab
-        setActiveTab('register');
-        setPhoneInput(user.phone || '');
-        setName(user.name || '');
-        setStreet(user.street || '');
-        setNumber(user.number || '');
-        setNeighborhood(user.neighborhood || 'Cidade Nova');
-        setReference(user.reference || '');
-        setCity(user.city || 'Franca-SP');
-        setDefaultPayment(user.defaultPayment || 'pix');
-      } else {
-        // Fresh Login / Register fresh mode
-        setActiveTab('login');
-        setPhoneInput('');
-        setName('');
-        setStreet('');
-        setNumber('');
-        setNeighborhood('Cidade Nova');
-        setReference('');
-        setCity('Franca-SP');
-        setDefaultPayment('pix');
-      }
+      setTimeout(() => {
+        setErrorMsg(null);
+        setSuccessMsg(null);
+        
+        if (user) {
+          // Edit Profile Mode: Pre-fill all fields and switch directly to register tab
+          setActiveTab('register');
+          setPhoneInput(user.phone || '');
+          setName(user.name || '');
+          setStreet(user.street || '');
+          setNumber(user.number || '');
+          setNeighborhood(user.neighborhood || 'Cidade Nova');
+          setReference(user.reference || '');
+          setCity(user.city || 'Franca-SP');
+          setDefaultPayment(user.defaultPayment || 'pix');
+        } else {
+          // Fresh Login / Register fresh mode
+          setActiveTab('login');
+          setPhoneInput('');
+          setName('');
+          setStreet('');
+          setNumber('');
+          setNeighborhood('Cidade Nova');
+          setReference('');
+          setCity('Franca-SP');
+          setDefaultPayment('pix');
+        }
+      }, 0);
     }
   }, [isOpen, user]);
 

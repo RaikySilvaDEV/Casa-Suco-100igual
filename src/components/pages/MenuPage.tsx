@@ -87,22 +87,28 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
   // Auto-sync preferred payment method and neighborhood from user profile
   useEffect(() => {
     if (user) {
-      setPaymentMethod(user.defaultPayment || 'pix');
-      setCurrentNeighborhood(user.neighborhood || 'Cidade Nova');
+      setTimeout(() => {
+        setPaymentMethod(user.defaultPayment || 'pix');
+        setCurrentNeighborhood(user.neighborhood || 'Cidade Nova');
+      }, 0);
     }
   }, [user, checkoutStep]);
 
   // Reset checkout step to Passo 1 when drawer is opened
   useEffect(() => {
     if (isCartOpen) {
-      setCheckoutStep('local');
+      setTimeout(() => {
+        setCheckoutStep('local');
+      }, 0);
     }
   }, [isCartOpen]);
 
   // Close drawer if cart becomes empty
   useEffect(() => {
     if (cart.length === 0) {
-      setIsCartOpen(false);
+      setTimeout(() => {
+        setIsCartOpen(false);
+      }, 0);
     }
   }, [cart]);
 
@@ -926,7 +932,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                             <button
                               key={item.id}
                               onClick={() => {
-                                setPaymentMethod(item.id as any);
+                                setPaymentMethod(item.id as 'pix' | 'money' | 'credit' | 'debit');
                                 if (item.id !== 'money') setChangeFor('');
                               }}
                               className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs font-bold uppercase transition-all cursor-pointer ${

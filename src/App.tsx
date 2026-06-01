@@ -27,7 +27,17 @@ import mockUsers from './data/mockUsers.json';
 
 export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageName>('home');
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    const savedUser = localStorage.getItem('100igual_user_profile');
+    if (savedUser) {
+      try {
+        return JSON.parse(savedUser);
+      } catch (e) {
+        console.error('Error parsing user profile from localStorage:', e);
+      }
+    }
+    return null;
+  });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Page scroll progress bar at the very top of the screen
@@ -46,15 +56,6 @@ export const App: React.FC = () => {
     const savedRegistry = localStorage.getItem('100igual_registered_profiles');
     if (!savedRegistry) {
       localStorage.setItem('100igual_registered_profiles', JSON.stringify(mockUsers));
-    }
-    
-    const savedUser = localStorage.getItem('100igual_user_profile');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        console.error('Error parsing user profile from localStorage:', e);
-      }
     }
   }, []);
 
