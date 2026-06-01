@@ -100,12 +100,12 @@ const INGREDIENTS_BENEFITS = [
 ];
 
 // Simple Sun SVG Icon component since Lucide Sun might clash / not load
-function SunIcon(props: React.SVGProps<SVGSVGElement>) {
+function SunIcon({ size, ...props }: { size?: number | string } & React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="24"
-      height="24"
+      width={size || "24"}
+      height={size || "24"}
       stroke="currentColor"
       strokeWidth="2"
       fill="none"
