@@ -17,9 +17,11 @@ import {
   CreditCard,
   Landmark,
   Edit2,
-  UserCheck,
   ChevronLeft,
-  X
+  X,
+  MapPin,
+  ShieldCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { MENU_ITEMS, type MenuItem } from '../../data/mockData';
 import { type UserProfile } from '../ui/AuthModal';
@@ -73,10 +75,10 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
   const [customizationMode, setCustomizationMode] = useState<'default' | 'custom'>('default');
   const [selectedFruits, setSelectedFruits] = useState<string[]>([]);
 
-  // Checkout configuration states (Step 2)
-  const [checkoutStep, setCheckoutStep] = useState<'cart' | 'shipping'>('cart');
-  const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
+  // 4-Step Checkout Configuration Wizard States
+  const [checkoutStep, setCheckoutStep] = useState<'local' | 'cart' | 'auth' | 'shipping'>('local');
   const [pickupLocation, setPickupLocation] = useState('Presidente Vargas');
+  const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'money' | 'credit' | 'debit'>('pix');
   const [changeFor, setChangeFor] = useState('');
 
@@ -87,17 +89,16 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     }
   }, [user, checkoutStep]);
 
-  // Reset checkout step when drawer is closed
+  // Reset checkout step to Passo 1 when drawer is opened
   useEffect(() => {
-    if (!isCartOpen) {
-      setCheckoutStep('cart');
+    if (isCartOpen) {
+      setCheckoutStep('local');
     }
   }, [isCartOpen]);
 
-  // Reset checkout step if cart becomes empty
+  // Close drawer if cart becomes empty
   useEffect(() => {
     if (cart.length === 0) {
-      setCheckoutStep('cart');
       setIsCartOpen(false);
     }
   }, [cart]);
@@ -117,7 +118,6 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
   // Shopping Cart Actions
   const addToCart = (product: MenuItem, customFruits?: string[]) => {
     setCart((prevCart) => {
-      // Find item with same product ID AND exact same custom blend combination
       const existingItem = prevCart.find((item) => {
         const hasSameId = item.product.id === product.id;
         const hasSameCustom = JSON.stringify(item.customFruits) === JSON.stringify(customFruits);
@@ -198,7 +198,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
     message += `-------------------------------------------\n`;
     message += `👤 *CLIENTE:* ${user.name}\n`;
     message += `📞 *TELEFONE:* ${user.phone}\n`;
-    message += `🏍️ *TIPO:* ${deliveryType === 'delivery' ? 'Entrega Residencial' : 'Retirada na Loja'}\n`;
+    message += `🏍 *TIPO:* ${deliveryType === 'delivery' ? 'Entrega Residencial' : 'Retirada na Loja'}\n`;
     
     if (deliveryType === 'delivery') {
       message += `📍 *ENDEREÇO:* ${user.street}, ${user.number}\n`;
@@ -206,13 +206,13 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
       if (user.reference) {
         message += `🎯 *REF:* ${user.reference}\n`;
       }
-      message += `🏙️ *CIDADE:* ${user.city}\n`;
+      message += `🏙 *CIDADE:* ${user.city}\n`;
     } else {
       message += `🏢 *RETIRAR EM:* Unidade ${pickupLocation}\n`;
     }
     
     message += `-------------------------------------------\n`;
-    message += `🛍️ *ITENS DO PEDIDO:*\n`;
+    message += `🛍 *ITENS DO PEDIDO:*\n`;
 
     cart.forEach((item) => {
       const priceVal = parseFloat(item.product.price.replace('R$ ', '').replace(',', '.'));
@@ -527,33 +527,29 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
-              {/* Drawer Header */}
+              {/* Drawer Header (Title) */}
               <div className="p-6 border-b border-white/5 flex items-center justify-between bg-[#111111]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#8ac926]/10 flex items-center justify-center text-[#8ac926]">
                     <ShoppingBag size={20} className="stroke-[2]" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-lg text-white uppercase tracking-tight">
-                      {checkoutStep === 'cart' ? 'Sua Sacola' : 'Configurações'}
-                    </h3>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-offWhite/45 font-medium leading-tight mt-0.5">
-                      {checkoutStep === 'cart' ? (
-                        `${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'itens'} adicionados`
-                      ) : (
-                        'Entrega & Pagamento'
-                      )}
+                    <h3 className="font-extrabold text-lg text-white uppercase tracking-tight">Sua Compra</h3>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-offWhite/45 font-medium leading-none mt-1">
+                      {checkoutStep === 'local' && 'Passo 1: Escolha a Loja'}
+                      {checkoutStep === 'cart' && 'Passo 2: Revise os Produtos'}
+                      {checkoutStep === 'auth' && 'Passo 3: Identificação'}
+                      {checkoutStep === 'shipping' && 'Passo 4: Finalize o Pedido'}
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => {
-                    if (checkoutStep === 'shipping') {
-                      setCheckoutStep('cart');
-                    } else {
-                      setIsCartOpen(false);
-                    }
+                    if (checkoutStep === 'shipping') setCheckoutStep('auth');
+                    else if (checkoutStep === 'auth') setCheckoutStep('cart');
+                    else if (checkoutStep === 'cart') setCheckoutStep('local');
+                    else setIsCartOpen(false);
                   }}
                   className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-offWhite cursor-pointer"
                 >
@@ -561,10 +557,97 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                 </button>
               </div>
 
+              {/* 4-Step Progress Indicator Header Strip */}
+              <div className="px-6 py-3 bg-[#161616] border-b border-white/5 flex items-center justify-between text-[9px] font-black uppercase tracking-wider text-offWhite/45">
+                <button
+                  onClick={() => setCheckoutStep('local')}
+                  className="flex items-center gap-1 bg-transparent border-none outline-none cursor-pointer text-left"
+                >
+                  <span className={`w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold text-[9px] ${checkoutStep === 'local' ? 'bg-[#8ac926] text-black shadow-md' : 'bg-white/10 text-offWhite'}`}>1</span>
+                  <span className={checkoutStep === 'local' ? 'text-white font-extrabold' : ''}>Local</span>
+                </button>
+                <span className="text-white/10 text-[8px]">➔</span>
+                
+                <button
+                  disabled={cart.length === 0}
+                  onClick={() => setCheckoutStep('cart')}
+                  className="flex items-center gap-1 bg-transparent border-none outline-none cursor-pointer text-left disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span className={`w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold text-[9px] ${checkoutStep === 'cart' ? 'bg-[#8ac926] text-black shadow-md' : 'bg-white/10 text-offWhite'}`}>2</span>
+                  <span className={checkoutStep === 'cart' ? 'text-white font-extrabold' : ''}>Sacola</span>
+                </button>
+                <span className="text-white/10 text-[8px]">➔</span>
+
+                <button
+                  disabled={cart.length === 0}
+                  onClick={() => setCheckoutStep('auth')}
+                  className="flex items-center gap-1 bg-transparent border-none outline-none cursor-pointer text-left disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span className={`w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold text-[9px] ${checkoutStep === 'auth' ? 'bg-[#8ac926] text-black shadow-md' : 'bg-white/10 text-offWhite'}`}>3</span>
+                  <span className={checkoutStep === 'auth' ? 'text-white font-extrabold' : ''}>Login</span>
+                </button>
+                <span className="text-white/10 text-[8px]">➔</span>
+
+                <button
+                  disabled={cart.length === 0 || !user}
+                  onClick={() => setCheckoutStep('shipping')}
+                  className="flex items-center gap-1 bg-transparent border-none outline-none cursor-pointer text-left disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span className={`w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold text-[9px] ${checkoutStep === 'shipping' ? 'bg-[#8ac926] text-black shadow-md' : 'bg-white/10 text-offWhite'}`}>4</span>
+                  <span className={checkoutStep === 'shipping' ? 'text-white font-extrabold' : ''}>Pagar</span>
+                </button>
+              </div>
+
               {/* Drawer Scrollable Body Content */}
-              <div className="flex-grow overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                {checkoutStep === 'cart' ? (
-                  /* Step 1: Cart Items List */
+              <div className="flex-grow overflow-y-auto p-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                
+                {/* PASSO 1: ESCOLHER O LOCAL */}
+                {checkoutStep === 'local' && (
+                  <div className="space-y-5 text-left">
+                    <div className="p-4 bg-[#111111] border border-white/5 rounded-2xl flex gap-3.5 items-start">
+                      <MapPin size={20} className="text-[#8ac926] shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-extrabold text-sm text-white uppercase tracking-tight mb-1">
+                          Selecione o Ponto de Preparo
+                        </h4>
+                        <p className="text-xs text-offWhite/50 leading-relaxed font-semibold">
+                          Por favor, confirme em qual das duas unidades de Franca-SP seu pedido deve ser processado.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {[
+                        { id: 'Presidente Vargas', address: 'Av. Pres. Vargas, 840 - Cidade Nova' },
+                        { id: 'Paulo VI', address: 'Av. Dr. Flávio Rocha, 500 - Vila Paulo VI' }
+                      ].map((loc) => {
+                        const isLocSelected = pickupLocation === loc.id;
+                        return (
+                          <button
+                            key={loc.id}
+                            onClick={() => setPickupLocation(loc.id)}
+                            className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-center leading-tight ${
+                              isLocSelected
+                                ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926] shadow-lg shadow-[#8ac926]/5'
+                                : 'bg-[#111111] border-white/5 text-offWhite/65 hover:text-white hover:border-white/10'
+                            }`}
+                          >
+                            <span className="font-black text-sm uppercase tracking-wide mb-1.5 text-white flex items-center gap-1.5">
+                              <Store size={14} className={isLocSelected ? 'text-[#8ac926]' : 'text-offWhite/45'} />
+                              Unidade {loc.id}
+                            </span>
+                            <span className="text-xs text-offWhite/45 font-medium leading-tight">
+                              {loc.address}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* PASSO 2: ESCOLHER O PRODUTO / REVISAR SACOLA */}
+                {checkoutStep === 'cart' && (
                   cart.length > 0 ? (
                     cart.map((item) => {
                       const priceVal = parseFloat(item.product.price.replace('R$ ', '').replace(',', '.'));
@@ -576,7 +659,6 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                           key={itemKey}
                           className="bg-[#111111] border border-white/5 rounded-2xl p-4 flex gap-4"
                         >
-                          {/* Product Mini Image */}
                           <div className="w-16 h-16 rounded-xl overflow-hidden select-none shrink-0 bg-black/45">
                             <img
                               src={item.product.image}
@@ -585,8 +667,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                             />
                           </div>
 
-                          {/* Product Info */}
-                          <div className="flex-grow flex flex-col justify-between">
+                          <div className="flex-grow flex flex-col justify-between text-left">
                             <div>
                               <div className="flex items-start justify-between gap-2">
                                 <div>
@@ -611,7 +692,6 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                               </span>
                             </div>
 
-                            {/* Controls Row */}
                             <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
                               <span className="text-[#8ac926] font-bold text-sm">
                                 R$ {itemSubtotal}
@@ -645,62 +725,86 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                         <ShoppingBag size={48} className="stroke-[1]" />
                       </div>
                       <h4 className="font-extrabold text-base text-white mb-1">Sua sacola está vazia</h4>
-                      <p className="text-xs text-offWhite/45">
-                        Explore nosso cardápio completo e adicione itens para iniciar o seu pedido!
+                      <p className="text-xs text-offWhite/45 font-medium leading-relaxed">
+                        Explore nosso cardápio completo, adicione os produtos desejados e prossiga com o pedido!
                       </p>
                     </div>
                   )
-                ) : (
-                  /* Step 2: Shipping & Payment Preferences */
-                  <div className="space-y-6">
-                    {/* Logged in User Check / Profile summary */}
+                )}
+
+                {/* PASSO 3: IDENTIFICAR LOGIN OU NÃO */}
+                {checkoutStep === 'auth' && (
+                  <div className="space-y-5 text-left">
                     {user ? (
-                      <div className="p-4 rounded-2xl bg-green-950/10 border border-[#8ac926]/20 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-[#8ac926] text-black flex items-center justify-center font-black text-xs uppercase leading-none shadow-md">
+                      /* LOGGED IN (Green card with pre-filled details) */
+                      <div className="space-y-4">
+                        <div className="p-5 rounded-2xl bg-green-950/10 border border-[#8ac926]/30 flex flex-col items-center text-center gap-3 shadow-lg">
+                          <div className="w-14 h-14 rounded-full bg-[#8ac926] text-black flex items-center justify-center font-black text-xl uppercase leading-none shadow-md">
                             {user.name.charAt(0)}
                           </div>
+                          
                           <div>
-                            <span className="block text-[10px] font-black uppercase tracking-wider text-[#8ac926]">
-                              Cliente Identificado
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8ac926]/15 border border-[#8ac926]/20 text-[#8ac926] text-[9px] font-black uppercase tracking-wider mb-1.5">
+                              <ShieldCheck size={10} />
+                              Cliente Conectado
                             </span>
-                            <span className="text-sm font-extrabold text-white leading-tight">
-                              {user.name}
-                            </span>
+                            <h4 className="font-extrabold text-base text-white">{user.name}</h4>
+                            <p className="text-xs text-offWhite/45 font-semibold mt-0.5">{user.phone}</p>
                           </div>
                         </div>
-                        
-                        <button
-                          onClick={onOpenAuth}
-                          className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-[#8ac926] hover:text-black transition-all cursor-pointer font-bold text-[10px] uppercase tracking-wide"
-                        >
-                          <Edit2 size={10} />
-                          <span>Editar</span>
-                        </button>
+
+                        {/* Pre-filled delivery address summary */}
+                        <div className="p-5 bg-[#111111] border border-white/5 rounded-2xl space-y-3 shadow-xl">
+                          <span className="block text-[9px] font-black uppercase tracking-widest text-[#8ac926]">
+                            Endereço de Entrega Cadastrado
+                          </span>
+                          <div className="space-y-2 text-xs font-semibold text-offWhite/80 leading-relaxed">
+                            <p><span className="text-offWhite/35 block text-[8px] uppercase tracking-wider">Rua</span>{user.street}, nº {user.number}</p>
+                            <p><span className="text-offWhite/35 block text-[8px] uppercase tracking-wider">Bairro</span>{user.neighborhood}</p>
+                            {user.reference && <p><span className="text-offWhite/35 block text-[8px] uppercase tracking-wider">Complemento/Referência</span>{user.reference}</p>}
+                            <p><span className="text-offWhite/35 block text-[8px] uppercase tracking-wider">Cidade</span>{user.city}</p>
+                          </div>
+
+                          <button
+                            onClick={onOpenAuth}
+                            className="w-full mt-3 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-white/5 border border-white/10 hover:bg-[#8ac926] hover:text-black transition-all cursor-pointer font-black text-[10px] uppercase tracking-wide"
+                          >
+                            <Edit2 size={12} />
+                            <span>Editar Endereço / Perfil</span>
+                          </button>
+                        </div>
                       </div>
                     ) : (
-                      <div className="p-5 rounded-2xl bg-yellow-950/10 border border-yellow-500/20 text-center space-y-4">
-                        <div className="flex justify-center text-yellow-400">
-                          <UserCheck size={32} className="stroke-[1.5]" />
+                      /* NOT LOGGED IN (Prompt user to register) */
+                      <div className="p-6 rounded-3xl bg-yellow-950/10 border border-yellow-500/20 text-center space-y-5 shadow-2xl">
+                        <div className="flex justify-center text-yellow-500">
+                          <AlertTriangle size={38} className="stroke-[1.5]" />
                         </div>
-                        <div className="space-y-1">
-                          <h4 className="font-extrabold text-sm text-white uppercase tracking-wider">
-                            Identificação Obrigatória
+                        
+                        <div className="space-y-2">
+                          <h4 className="font-black text-sm text-white uppercase tracking-wider">
+                            Identificação Necessária
                           </h4>
-                          <p className="text-xs text-offWhite/50 leading-relaxed font-medium px-2">
-                            Faça login ou cadastre seu endereço residencial para calcularmos o motoboy e sincronizarmos seu telefone!
+                          <p className="text-xs text-offWhite/60 leading-relaxed font-semibold px-2">
+                            Não identificamos login conectado. Para continuarmos e emitirmos seu cupom de motoboy com endereço, cadastre seu perfil ou faça login rapidamente!
                           </p>
                         </div>
+
                         <button
                           onClick={onOpenAuth}
-                          className="w-full py-3 rounded-xl bg-[#8ac926] hover:bg-[#8ac926]/90 text-black font-black text-xs uppercase tracking-widest transition-all cursor-pointer shadow-md shadow-[#8ac926]/10"
+                          className="w-full py-4 rounded-2xl bg-[#8ac926] hover:bg-[#8ac926]/90 text-black font-black text-xs uppercase tracking-widest transition-all cursor-pointer shadow-lg shadow-[#8ac926]/10"
                         >
-                          Entrar ou Cadastrar Conta
+                          Cadastrar ou Entrar na Conta
                         </button>
                       </div>
                     )}
+                  </div>
+                )}
 
-                    {/* Delivery Method Choice Toggles */}
+                {/* PASSO 4: FINALIZAR PEDIDO (ENTREGA, RETIRADA E PAGAMENTO) */}
+                {checkoutStep === 'shipping' && user && (
+                  <div className="space-y-6 text-left">
+                    {/* Method Choice */}
                     <div className="space-y-2.5">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-offWhite/45">
                         Método de Recebimento
@@ -710,7 +814,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                           onClick={() => setDeliveryType('delivery')}
                           className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all cursor-pointer gap-2 ${
                             deliveryType === 'delivery'
-                              ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926]'
+                              ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926] shadow-md shadow-[#8ac926]/5'
                               : 'bg-[#111111] border-white/5 text-offWhite/65 hover:text-white'
                           }`}
                         >
@@ -722,7 +826,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                           onClick={() => setDeliveryType('pickup')}
                           className={`flex flex-col items-center justify-center p-4 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all cursor-pointer gap-2 ${
                             deliveryType === 'pickup'
-                              ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926]'
+                              ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926] shadow-md shadow-[#8ac926]/5'
                               : 'bg-[#111111] border-white/5 text-offWhite/65 hover:text-white'
                           }`}
                         >
@@ -732,73 +836,36 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                       </div>
                     </div>
 
-                    {/* Delivery Type Conditionals */}
+                    {/* Method Conditionals */}
                     {deliveryType === 'delivery' ? (
-                      /* Address view (visible only if logged in) */
-                      user && (
-                        <div className="p-5 bg-[#111111] border border-white/5 rounded-2xl space-y-3">
-                          <span className="block text-[10px] font-black uppercase tracking-widest text-offWhite/45">
-                            Coordenadas de Entrega
+                      /* Address block */
+                      <div className="p-4 bg-[#111111] border border-white/5 rounded-2xl space-y-2 text-xs font-semibold leading-relaxed">
+                        <div className="flex items-center justify-between">
+                          <span className="block text-[9px] font-black uppercase tracking-widest text-offWhite/45">
+                            Local de Entrega
                           </span>
-                          
-                          <div className="space-y-2 text-xs font-medium">
-                            <p className="text-white">
-                              <span className="text-offWhite/45 block text-[9px] uppercase font-bold">Rua / Número</span>
-                              {user.street}, {user.number}
-                            </p>
-                            <p className="text-white">
-                              <span className="text-offWhite/45 block text-[9px] uppercase font-bold">Bairro</span>
-                              {user.neighborhood}
-                            </p>
-                            {user.reference && (
-                              <p className="text-white">
-                                <span className="text-offWhite/45 block text-[9px] uppercase font-bold">Ponto de Referência</span>
-                                {user.reference}
-                              </p>
-                            )}
-                            <p className="text-white">
-                              <span className="text-offWhite/45 block text-[9px] uppercase font-bold">Cidade</span>
-                              {user.city}
-                            </p>
-                          </div>
+                          <span className="text-[10px] text-[#8ac926] font-bold uppercase">Motoboy Express</span>
                         </div>
-                      )
+                        <p className="text-white pt-1">{user.street}, nº {user.number} - {user.neighborhood}</p>
+                        {user.reference && <p className="text-offWhite/50 text-[11px]">Ref: {user.reference}</p>}
+                      </div>
                     ) : (
-                      /* Pickup Location Select */
-                      <div className="space-y-2.5">
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-offWhite/45">
-                          Selecione a Unidade de Retirada
-                        </label>
-                        <div className="space-y-2">
-                          {[
-                            { id: 'Presidente Vargas', address: 'Av. Pres. Vargas, 840 - Cidade Nova' },
-                            { id: 'Paulo VI', address: 'Av. Dr. Flávio Rocha, 500 - Vila Paulo VI' }
-                          ].map((loc) => {
-                            const isLocSelected = pickupLocation === loc.id;
-                            return (
-                              <button
-                                key={loc.id}
-                                onClick={() => setPickupLocation(loc.id)}
-                                className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-center leading-tight ${
-                                  isLocSelected
-                                    ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926]'
-                                    : 'bg-[#111111] border-white/5 text-offWhite/65 hover:text-white'
-                                }`}
-                              >
-                                <span className="font-extrabold text-xs uppercase tracking-wide mb-1 text-white">
-                                  Unidade {loc.id}
-                                </span>
-                                <span className="text-[10px] text-offWhite/45 font-medium">
-                                  {loc.address}
-                                </span>
-                              </button>
-                            );
-                          })}
+                      /* Pickup Confirmed Branch (Sets back to selection chosen in Step 1) */
+                      <div className="p-4 bg-[#111111] border border-white/5 rounded-2xl space-y-2 text-xs font-semibold leading-relaxed">
+                        <div className="flex items-center justify-between">
+                          <span className="block text-[9px] font-black uppercase tracking-widest text-offWhite/45">
+                            Retirar na Unidade
+                          </span>
+                          <span className="text-[10px] text-green-400 font-bold uppercase">Taxa Grátis</span>
                         </div>
+                        <p className="text-white pt-1">Unidade {pickupLocation}</p>
+                        <p className="text-offWhite/45 text-[10px] font-medium leading-tight">
+                          Endereço: {pickupLocation === 'Presidente Vargas' ? 'Av. Pres. Vargas, 840' : 'Av. Dr. Flávio Rocha, 500'}
+                        </p>
                       </div>
                     )}
 
-                    {/* Payment Select Option */}
+                    {/* Payment Select */}
                     <div className="space-y-2.5">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-offWhite/45">
                         Forma de Pagamento
@@ -821,7 +888,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                               }}
                               className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs font-bold uppercase transition-all cursor-pointer ${
                                 isSelected
-                                  ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926]'
+                                  ? 'bg-[#8ac926]/10 border-[#8ac926] text-[#8ac926] shadow-md shadow-[#8ac926]/5'
                                   : 'bg-[#111111] border-white/5 text-offWhite/65 hover:text-white'
                               }`}
                             >
@@ -833,7 +900,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                       </div>
                     </div>
 
-                    {/* Cash Change Input Conditional */}
+                    {/* Money Change Input */}
                     {paymentMethod === 'money' && (
                       <motion.div
                         className="space-y-2"
@@ -860,16 +927,16 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
               {/* Drawer Footer Checkout Panel */}
               <div className="p-6 border-t border-white/5 bg-[#111111]">
                 <div className="space-y-2 mb-6">
-                  {/* Summary Pricing Details */}
-                  {checkoutStep === 'shipping' && (
-                    <div className="space-y-1.5 pb-3 border-b border-white/5 text-xs text-offWhite/65">
+                  {/* Pricing summaries for steps beyond cart */}
+                  {checkoutStep !== 'local' && (
+                    <div className="space-y-1.5 pb-3 border-b border-white/5 text-xs text-offWhite/65 text-left">
                       <div className="flex items-center justify-between">
-                        <span>Subtotal dos Sucos:</span>
+                        <span>Subtotal dos Produtos:</span>
                         <span className="text-white font-semibold">
                           R$ {cartTotal.toFixed(2).replace('.', ',')}
                         </span>
                       </div>
-                      {deliveryType === 'delivery' && (
+                      {checkoutStep === 'shipping' && deliveryType === 'delivery' && (
                         <div className="flex items-center justify-between">
                           <span>Taxa de Entrega (Motoboy):</span>
                           <span className="text-white font-semibold">
@@ -880,10 +947,10 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                     </div>
                   )}
 
-                  {/* Total Display */}
+                  {/* Total pricing */}
                   <div className="flex items-center justify-between pt-1">
                     <span className="font-bold text-sm uppercase tracking-wider text-offWhite/60">
-                      Valor Total:
+                      Total Geral:
                     </span>
                     <span className="text-[#8ac926] font-black text-2xl">
                       R$ {grandTotal.toFixed(2).replace('.', ',')}
@@ -891,26 +958,58 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onBackToHome, user, onOpenAu
                   </div>
                 </div>
 
-                {checkoutStep === 'cart' ? (
-                  /* Step 1 CTA button */
+                {/* PASSO 1 CTA */}
+                {checkoutStep === 'local' && (
                   <button
-                    onClick={() => setCheckoutStep('shipping')}
-                    disabled={cart.length === 0}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-[#8ac926] text-black font-black text-sm uppercase tracking-wider hover:scale-102 active:scale-98 transition-all duration-300 shadow-xl cursor-pointer disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-offWhite/25"
+                    onClick={() => setCheckoutStep('cart')}
+                    className="w-full flex items-center justify-center py-4 rounded-2xl bg-[#8ac926] text-black font-black text-xs uppercase tracking-wider hover:scale-102 active:scale-98 transition-all duration-300 shadow-xl cursor-pointer"
                   >
-                    <span>Prosseguir para Recebimento</span>
+                    <span>Confirmar Loja e Ver Sacola</span>
                   </button>
-                ) : (
-                  /* Step 2 CTA button */
+                )}
+
+                {/* PASSO 2 CTA */}
+                {checkoutStep === 'cart' && (
+                  <button
+                    onClick={() => setCheckoutStep('auth')}
+                    disabled={cart.length === 0}
+                    className="w-full flex items-center justify-center py-4 rounded-2xl bg-[#8ac926] text-black font-black text-xs uppercase tracking-wider hover:scale-102 active:scale-98 transition-all duration-300 shadow-xl cursor-pointer disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-offWhite/25"
+                  >
+                    <span>Prosseguir para Identificação</span>
+                  </button>
+                )}
+
+                {/* PASSO 3 CTA */}
+                {checkoutStep === 'auth' && (
+                  <button
+                    onClick={() => {
+                      if (user) {
+                        setCheckoutStep('shipping');
+                      } else {
+                        onOpenAuth();
+                      }
+                    }}
+                    className={`w-full flex items-center justify-center py-4 rounded-2xl text-black font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-xl cursor-pointer ${
+                      user 
+                        ? 'bg-[#8ac926] hover:scale-102 active:scale-98'
+                        : 'bg-yellow-500 hover:bg-yellow-400 hover:scale-102 active:scale-98 shadow-yellow-500/10'
+                    }`}
+                  >
+                    <span>{user ? 'Prosseguir para Pagamento' : 'Identificar / Logar no Site'}</span>
+                  </button>
+                )}
+
+                {/* PASSO 4 CTA */}
+                {checkoutStep === 'shipping' && (
                   <button
                     onClick={handleCheckout}
                     disabled={cart.length === 0 || !user}
-                    className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-[#8ac926] disabled:bg-white/5 disabled:text-offWhite/25 disabled:border-white/5 text-black font-black text-sm uppercase tracking-wider transition-all duration-300 hover:scale-102 active:scale-98 shadow-xl cursor-pointer disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-[#8ac926] disabled:bg-white/5 disabled:text-offWhite/25 disabled:border-white/5 text-black font-black text-xs uppercase tracking-wider transition-all duration-300 hover:scale-102 active:scale-98 shadow-xl cursor-pointer disabled:cursor-not-allowed"
                   >
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.98-1.865-1.865-4.343-2.89-6.985-2.891-5.439 0-9.865 4.42-9.869 9.865-.001 1.748.461 3.456 1.338 4.966L1.879 21.03l4.768-1.876zm12.338-7.986c-.328-.164-1.94-.957-2.24-1.066-.298-.11-.517-.164-.734.164-.218.328-.846 1.066-1.037 1.284-.19.218-.38.245-.708.081-.328-.164-1.386-.51-2.64-1.627-.975-.87-1.633-1.946-1.824-2.274-.19-.328-.02-.505.143-.668.148-.147.328-.383.493-.574.164-.19.218-.328.328-.547.11-.218.055-.41-.027-.574-.082-.164-.734-1.77-.997-2.42-.258-.633-.518-.547-.708-.557-.183-.01-.39-.01-.6-.01-.21 0-.555.08-.846.398-.29.319-1.11 1.085-1.11 2.648 0 1.564 1.138 3.078 1.293 3.296.155.218 2.24 3.42 5.423 4.795.757.327 1.348.52 1.81.667.76.241 1.45.207 1.996.126.608-.09 1.94-.793 2.214-1.56.273-.766.273-1.422.19-1.56-.081-.137-.298-.218-.626-.382z"/>
                     </svg>
-                    <span>Finalizar e Enviar Pedido</span>
+                    <span>Finalizar Pedido via WhatsApp</span>
                   </button>
                 )}
               </div>
