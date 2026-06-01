@@ -57,7 +57,12 @@ export const Hero: React.FC = () => {
       <AuroraBackground />
 
       {/* Widescreen Background Video */}
-      <div className="absolute inset-0 lg:left-auto lg:w-[85%] z-10 pointer-events-none select-none overflow-hidden">
+      <motion.div
+        className="absolute inset-0 lg:left-auto lg:w-[85%] z-10 pointer-events-none select-none overflow-hidden"
+        initial={{ opacity: 0, scale: 1.08, filter: 'blur(12px)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+      >
         <video
           ref={videoRef}
           src="/Smoothie_cups_on_black_background.mp4"
@@ -72,7 +77,7 @@ export const Hero: React.FC = () => {
         {/* Buttery smooth gradient overlay blending left edge into the solid black background */}
         <div className="absolute inset-y-0 left-0 w-full lg:w-1/4 bg-gradient-to-r from-[#000000] via-[#000000]/55 to-transparent pointer-events-none" />
         <div className="absolute inset-0 bg-black/45 lg:bg-black/15 pointer-events-none" />
-      </div>
+      </motion.div>
 
       {/* Premium Circular Seal (Selo 100% Natural - Alinhado na Banana) */}
       <motion.div

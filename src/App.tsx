@@ -14,8 +14,13 @@ import { StoresPage } from './components/pages/StoresPage';
 import { BenefitsPage } from './components/pages/BenefitsPage';
 import { ContactPage } from './components/pages/ContactPage';
 
+// Auth Dialog Components
+import { AuthModal, type UserProfile } from './components/ui/AuthModal';
+
 export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageName>('home');
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Page scroll progress bar at the very top of the screen
   const { scrollYProgress } = useScroll();
@@ -25,9 +30,18 @@ export const App: React.FC = () => {
     restDelta: 0.001
   });
 
+  // Load user profile on mount
   useEffect(() => {
-    // Scroll to top on page refresh
     window.history.scrollRestoration = 'manual';
+    
+    const savedUser = localStorage.getItem('100igual_user_profile');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error('Error parsing user profile from localStorage:', e);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -43,6 +57,16 @@ export const App: React.FC = () => {
     setCurrentPage('home');
   };
 
+  const handleLoginSuccess = (profile: UserProfile) => {
+    setUser(profile);
+    localStorage.setItem('100igual_user_profile', JSON.stringify(profile));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('100igual_user_profile');
+  };
+
   return (
     <div className="relative min-h-screen bg-[#080808] text-offWhite selection:bg-[#8ac926] selection:text-black font-sans antialiased overflow-x-hidden">
       
@@ -53,7 +77,13 @@ export const App: React.FC = () => {
       />
 
       {/* Premium Navbar */}
-      <Navbar currentPage={currentPage} onPageChange={handlePageChange} />
+      <Navbar
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+        user={user}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onLogout={handleLogout}
+      />
 
       {/* Animated Pages Container */}
       <AnimatePresence mode="wait">
@@ -87,7 +117,11 @@ export const App: React.FC = () => {
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
           >
-            <MenuPage onBackToHome={handleBackToHome} />
+            <MenuPage
+              onBackToHome={handleBackToHome}
+              user={user}
+              onOpenAuth={() => setIsAuthModalOpen(true)}
+            />
           </motion.div>
         )}
 
@@ -142,6 +176,13 @@ export const App: React.FC = () => {
 
       {/* Global Footer (CTA.tsx) */}
       <CTA />
+
+      {/* Authentication Modal Dialog */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
 
     </div>
   );
