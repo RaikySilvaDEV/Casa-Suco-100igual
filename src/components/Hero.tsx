@@ -133,14 +133,14 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
 
             {/* High-Contrast Bold Uppercase Heading */}
             <motion.h1
-              className="text-5xl sm:text-6xl md:text-[66px] font-black tracking-tight leading-[1.05] text-left uppercase mb-6 font-sans select-none"
+              className="text-4xl sm:text-5xl md:text-[58px] font-black tracking-tight leading-[1.05] text-left uppercase mb-6 font-sans select-none"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <span className="text-white block">Sabor de</span>
-              <span className="text-[#8ac926] block">verdade,</span>
-              <span className="text-white block">saúde todo dia!</span>
+              <span className="text-white block">Há 24 anos, a</span>
+              <span className="text-[#8ac926] block">mesma receita.</span>
+              <span className="text-white block">O mesmo sabor.</span>
             </motion.h1>
 
             {/* Description */}
@@ -150,43 +150,42 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              Sucos naturais, vitaminas especiais, açaí e muito mais!
+              Cada copo feito na hora com frutas rigorosamente selecionadas.
               <br />
-              Feitos com ingredientes selecionados para cuidar de você.
+              Para você, que não aceita menos do que o melhor.
             </motion.p>
 
-            {/* Swapped Buttons matching the exact banner style */}
+            {/* Buttons matching the institutional design */}
             <motion.div
               className="flex flex-wrap gap-4 items-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              {/* WhatsApp Button (Green, Left) */}
-              <a
-                href="https://wa.me/5516999999999"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#76a827] text-white font-black text-xs md:text-sm uppercase hover:bg-[#689f38] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg shadow-[#76a827]/10"
-              >
-                {/* WhatsApp SVG Icon */}
-                <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.98-1.865-1.865-4.343-2.89-6.985-2.891-5.439 0-9.865 4.42-9.869 9.865-.001 1.748.461 3.456 1.338 4.966L1.879 21.03l4.768-1.876zm12.338-7.986c-.328-.164-1.94-.957-2.24-1.066-.298-.11-.517-.164-.734.164-.218.328-.846 1.066-1.037 1.284-.19.218-.38.245-.708.081-.328-.164-1.386-.51-2.64-1.627-.975-.87-1.633-1.946-1.824-2.274-.19-.328-.02-.505.143-.668.148-.147.328-.383.493-.574.164-.19.218-.328.328-.547.11-.218.055-.41-.027-.574-.082-.164-.734-1.77-.997-2.42-.258-.633-.518-.547-.708-.557-.183-.01-.39-.01-.6-.01-.21 0-.555.08-.846.398-.29.319-1.11 1.085-1.11 2.648 0 1.564 1.138 3.078 1.293 3.296.155.218 2.24 3.42 5.423 4.795.757.327 1.348.52 1.81.667.76.241 1.45.207 1.996.126.608-.09 1.94-.793 2.214-1.56.273-.766.273-1.422.19-1.56-.081-.137-.298-.218-.626-.382z" />
-                </svg>
-                <span>Pedir no WhatsApp</span>
-              </a>
-
-              {/* Cardapio Button (Outline, Right) */}
+              {/* Ver Cardapio Button (Solid Green, Left) */}
               <button
                 onClick={() => {
                   if (onNavigate) {
                     onNavigate('menu');
                   }
                 }}
+                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#76a827] text-white font-black text-xs md:text-sm uppercase hover:bg-[#689f38] hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg shadow-[#76a827]/10 cursor-pointer"
+              >
+                <BookOpen size={16} className="text-white" />
+                <span>Ver Cardápio</span>
+              </button>
+
+              {/* Conheca nossa historia Button (Outline, Right) */}
+              <button
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('about');
+                  }
+                }}
                 className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-[#76a827] text-white font-black text-xs md:text-sm uppercase bg-transparent hover:bg-[#76a827]/10 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
               >
-                <BookOpen size={16} className="text-[#8ac926]" />
-                <span>Ver Cardápio</span>
+                <Leaf size={16} className="text-[#8ac926]" />
+                <span>Conheça nossa história</span>
               </button>
             </motion.div>
 

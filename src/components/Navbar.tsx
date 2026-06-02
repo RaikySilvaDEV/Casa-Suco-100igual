@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, User } from 'lucide-react';
-import { type UserProfile } from './ui/AuthModal';
+import { Menu, X, Leaf } from 'lucide-react';
 
 export type PageName = 'home' | 'menu' | 'about' | 'stores' | 'benefits' | 'contact';
 
@@ -17,17 +16,11 @@ const NAV_LINKS = [
 interface NavbarProps {
   currentPage: PageName;
   onPageChange: (page: PageName) => void;
-  user: UserProfile | null;
-  onOpenAuth: () => void;
-  onLogout: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentPage,
-  onPageChange,
-  user,
-  onOpenAuth,
-  onLogout
+  onPageChange
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -60,12 +53,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               onPageChange('home');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="flex flex-col text-left group cursor-pointer bg-transparent border-none outline-none"
+            className="flex flex-col items-start text-left group cursor-pointer bg-transparent border-none outline-none"
           >
-            <span className="text-xl md:text-2xl font-black tracking-tight text-white group-hover:text-[#8ac926] transition-colors leading-none">
-              100<span className="text-[#8ac926]">IGUAL</span>
+            {/* Leaf icon above logo */}
+            <Leaf
+              size={16}
+              className="text-[#8ac926] mb-1"
+              style={{ filter: 'drop-shadow(0 0 4px rgba(138,201,38,0.6))' }}
+            />
+            <span className="text-xl md:text-2xl font-black tracking-tight leading-none">
+              <span className="text-[#f97316]">100</span><span className="text-white">IGUAL</span>
             </span>
-            <span className="text-[8px] tracking-[0.18em] text-[#8ac926] uppercase font-bold mt-1 group-hover:text-white transition-colors">
+            <span className="text-[8px] tracking-[0.18em] text-[#8ac926] uppercase font-bold mt-1">
               CASA DE SUCOS
             </span>
           </button>
@@ -98,41 +97,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </div>
 
-          {/* User Profile Pill & WhatsApp Button Container */}
+          {/* WhatsApp Green Pill Button */}
           <div className="hidden lg:flex items-center gap-4">
-            {/* User Profile Trigger */}
-            {user ? (
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 pl-3 pr-4 py-1.5 rounded-full shadow-lg">
-                <button
-                  onClick={onOpenAuth}
-                  className="flex items-center gap-2 text-white font-extrabold text-xs cursor-pointer hover:text-[#8ac926] transition-colors bg-transparent border-none outline-none"
-                >
-                  <div className="w-5.5 h-5.5 rounded-full bg-[#8ac926] text-black flex items-center justify-center font-black text-[9px] uppercase leading-none shadow-md shadow-[#8ac926]/10">
-                    {user.name.charAt(0)}
-                  </div>
-                  <span>{user.name.split(' ')[0]}</span>
-                </button>
-                <span className="w-[1px] h-3 bg-white/20" />
-                <button
-                  onClick={onLogout}
-                  className="text-[10px] font-black uppercase text-red-400 hover:text-red-300 transition-colors cursor-pointer bg-transparent border-none outline-none"
-                >
-                  Sair
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={onOpenAuth}
-                className="flex items-center gap-1.5 px-4.5 py-2 rounded-full border border-white/10 hover:border-white/20 text-white font-bold text-xs bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer outline-none"
-              >
-                <User size={13} className="text-[#8ac926]" />
-                <span>Entrar</span>
-              </button>
-            )}
-
-            {/* Pedir no WhatsApp Green Pill Button */}
             <a
-              href="https://wa.me/551637215494"
+              href="https://wa.me/551637215494?text=Ol%C3%A1!%20Vi%20o%20site%20e%20quero%20saber%20mais%20sobre%20a%20Casa%20de%20Sucos%20100%20Igual."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#4CAF50] hover:bg-[#43A047] text-white font-extrabold text-xs transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_5px_15px_rgba(76,175,80,0.2)]"
@@ -141,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.98-1.865-1.865-4.343-2.89-6.985-2.891-5.439 0-9.865 4.42-9.869 9.865-.001 1.748.461 3.456 1.338 4.966L1.879 21.03l4.768-1.876zm12.338-7.986c-.328-.164-1.94-.957-2.24-1.066-.298-.11-.517-.164-.734.164-.218.328-.846 1.066-1.037 1.284-.19.218-.38.245-.708.081-.328-.164-1.386-.51-2.64-1.627-.975-.87-1.633-1.946-1.824-2.274-.19-.328-.02-.505.143-.668.148-.147.328-.383.493-.574.164-.19.218-.328.328-.547.11-.218.055-.41-.027-.574-.082-.164-.734-1.77-.997-2.42-.258-.633-.518-.547-.708-.557-.183-.01-.39-.01-.6-.01-.21 0-.555.08-.846.398-.29.319-1.11 1.085-1.11 2.648 0 1.564 1.138 3.078 1.293 3.296.155.218 2.24 3.42 5.423 4.795.757.327 1.348.52 1.81.667.76.241 1.45.207 1.996.126.608-.09 1.94-.793 2.214-1.56.273-.766.273-1.422.19-1.56-.081-.137-.298-.218-.626-.382z"/>
               </svg>
-              <span>Pedir no WhatsApp</span>
+              <span>WhatsApp</span>
             </a>
           </div>
 
@@ -189,46 +157,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 );
               })}
 
-              {/* Mobile Auth Button */}
-              {user ? (
-                <div className="mt-4 flex flex-col items-center gap-3">
-                  <button
-                    onClick={() => {
-                      onOpenAuth();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="flex items-center gap-2 px-6 py-3 rounded-full border border-[#8ac926]/20 bg-[#8ac926]/5 text-white font-bold text-sm cursor-pointer outline-none"
-                  >
-                    <div className="w-6 h-6 rounded-full bg-[#8ac926] text-black flex items-center justify-center font-black text-[10px] uppercase leading-none shadow-md shadow-[#8ac926]/10">
-                      {user.name.charAt(0)}
-                    </div>
-                    <span>{user.name.split(' ')[0]} (Editar Perfil)</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      onLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="text-xs font-black uppercase text-red-400 hover:text-red-300 transition-colors cursor-pointer bg-transparent border-none outline-none"
-                  >
-                    Desconectar da Conta
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    onOpenAuth();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="mt-4 flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 text-white font-bold text-sm bg-white/5 cursor-pointer outline-none"
-                >
-                  <User size={16} className="text-[#8ac926]" />
-                  <span>Fazer Login</span>
-                </button>
-              )}
+
               
               <motion.a
-                href="https://wa.me/551637215494"
+                href="https://wa.me/551637215494?text=Ol%C3%A1!%20Vi%20o%20site%20e%20quero%20saber%20mais%20sobre%20a%20Casa%20de%20Sucos%20100%20Igual."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 flex items-center gap-2 px-6 py-3 rounded-xl bg-[#4CAF50] text-white font-extrabold hover:scale-105 active:scale-95 shadow-[0_5px_15px_rgba(76,175,80,0.2)] transition-all duration-300"
@@ -240,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.98-1.865-1.865-4.343-2.89-6.985-2.891-5.439 0-9.865 4.42-9.869 9.865-.001 1.748.461 3.456 1.338 4.966L1.879 21.03l4.768-1.876zm12.338-7.986c-.328-.164-1.94-.957-2.24-1.066-.298-.11-.517-.164-.734.164-.218.328-.846 1.066-1.037 1.284-.19.218-.38.245-.708.081-.328-.164-1.386-.51-2.64-1.627-.975-.87-1.633-1.946-1.824-2.274-.19-.328-.02-.505.143-.668.148-.147.328-.383.493-.574.164-.19.218-.328.328-.547.11-.218.055-.41-.027-.574-.082-.164-.734-1.77-.997-2.42-.258-.633-.518-.547-.708-.557-.183-.01-.39-.01-.6-.01-.21 0-.555.08-.846.398-.29.319-1.11 1.085-1.11 2.648 0 1.564 1.138 3.078 1.293 3.296.155.218 2.24 3.42 5.423 4.795.757.327 1.348.52 1.81.667.76.241 1.45.207 1.996.126.608-.09 1.94-.793 2.214-1.56.273-.766.273-1.422.19-1.56-.081-.137-.298-.218-.626-.382z"/>
                 </svg>
-                <span>Pedir no WhatsApp</span>
+                <span>WhatsApp</span>
               </motion.a>
             </div>
           </motion.div>

@@ -2,7 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Leaf, GlassWater, Zap, Heart } from 'lucide-react';
 
-export const Timeline: React.FC = () => {
+interface TimelineProps {
+  onNavigate?: (page: 'home' | 'menu' | 'about' | 'stores' | 'benefits' | 'contact') => void;
+}
+
+export const Timeline: React.FC<TimelineProps> = ({ onNavigate }) => {
   return (
     <section id="sobre" className="relative py-24 bg-[#0A0A0A] overflow-hidden border-t border-white/5">
       {/* Subtle tropical green background glows */}
@@ -39,14 +43,12 @@ export const Timeline: React.FC = () => {
             </p>
 
             {/* Button */}
-            <a
-              href="https://wa.me/5516999999999"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-white/20 text-offWhite font-extrabold text-sm bg-white/5 hover:bg-white/10 hover:border-white/40 transition-all duration-300"
+            <button
+              onClick={() => onNavigate && onNavigate('about')}
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-white/20 text-offWhite font-extrabold text-sm bg-white/5 hover:bg-white/10 hover:border-white/40 transition-all duration-300 cursor-pointer"
             >
               Saiba Mais Sobre Nós
-            </a>
+            </button>
           </motion.div>
 
           {/* Right Column: Storefront Image */}

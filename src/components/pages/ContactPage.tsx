@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send, Phone, Mail, MapPin, CheckCircle, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Phone, Mail, MapPin, ChevronDown, MessageSquare } from 'lucide-react';
 
 interface ContactPageProps {
   onBackToHome: () => void;
@@ -8,46 +8,34 @@ interface ContactPageProps {
 
 const FAQ_ITEMS = [
   {
-    question: "Como faço para pedir no Delivery?",
-    answer: "É extremamente simples! Você pode montar o seu pedido diretamente pela nossa sacola interativa no site (na página do cardápio) e concluir enviando para o nosso WhatsApp, ou nos ligar no telefone fixo de sua preferência."
+    question: "Qual o horário de funcionamento das lojas?",
+    answer: "Nossas duas unidades funcionam diariamente para melhor atender você. A Unidade Presidente Vargas abre de Segunda a Domingo das 09h00 às 00h00. A Unidade Paulo VI abre de Segunda a Domingo das 11h00 às 00h00."
   },
   {
-    question: "Vocês aceitam cartões de refeição (Alelo, Sodexo, Ticket)?",
-    answer: "Sim! Aceitamos os principais cartões de benefício refeição (Alelo Refeição, Sodexo Refeição, Ticket Refeição, VR Refeição) em todas as nossas unidades físicas e no delivery."
+    question: "Como funciona o Drive-Thru da Unidade Cidade Nova?",
+    answer: "O nosso Drive-Thru localizado na Av. Presidente Vargas, 840, é pioneiro em Franca-SP. Você pode passar com seu veículo e fazer o seu pedido diretamente na pista, ou falar conosco pelo WhatsApp para adiantar a preparação!"
   },
   {
-    question: "Qual o horário de entrega do delivery?",
-    answer: "Nosso delivery funciona de Segunda a Sábado das 11h00 às 23h30, e aos Domingos das 16h00 às 23h30. A taxa de entrega varia conforme a sua localização em Franca-SP."
+    question: "O Espaço Kids da Unidade Paulo VI é gratuito?",
+    answer: "Sim! Oferecemos uma estrutura ampla de recreação com playground completo e gratuito para crianças de 2 a 10 anos acompanhadas pelos pais na Unidade Paulo VI."
   },
   {
-    question: "Os lanches podem ser personalizados (retirar ingredientes)?",
-    answer: "Com certeza! Fazemos cada pedido do seu jeito. Pelo WhatsApp ou no salão, você pode solicitar a remoção ou acréscimo de ingredientes nos lanches e porções facilmente."
+    question: "Vocês aceitam cartões de refeição?",
+    answer: "Sim! Aceitamos os principais cartões de benefício refeição do mercado (Alelo Refeição, Sodexo Refeição, Ticket Refeição e VR Refeição) para consumo no salão em ambas as unidades."
   }
 ];
 
 export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
-  const [formData, setFormData] = useState({ name: '', email: '', subject: 'duvida', message: '' });
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) return;
-    
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: '', email: '', subject: 'duvida', message: '' });
-    }, 4000);
-  };
 
   const toggleFaq = (idx: number) => {
     setOpenFaqIdx((prev) => (prev === idx ? null : idx));
+  };
+
+  const handleWhatsappOpen = () => {
+    const text = encodeURIComponent('Olá! Vi o site e quero saber mais sobre a Casa de Sucos 100 Igual.');
+    const whatsappNum = '551637215494';
+    window.open(`https://wa.me/${whatsappNum}?text=${text}`, '_blank');
   };
 
   return (
@@ -94,124 +82,45 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-sm sm:text-base text-offWhite/60"
           >
-            Dúvidas, sugestões, críticas ou elogios? Envie uma mensagem ou fale conosco em nossos canais diretos!
+            Dúvidas, informações, reservas ou sugestões? Estamos prontos para te atender diretamente pelo nosso canal oficial.
           </motion.p>
         </div>
 
         {/* Contact Split Form & Info Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mb-24">
           
-          {/* Left Column: Glassmorphic Message Form */}
-          <div className="lg:col-span-7 bg-[#111111]/85 border border-white/5 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden flex flex-col justify-center">
-            <AnimatePresence mode="wait">
-              {!isSubmitted ? (
-                <motion.form
-                  key="form"
-                  onSubmit={handleSubmit}
-                  className="space-y-6"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <h3 className="text-xl font-black uppercase text-white mb-2">
-                    Envie uma Mensagem
-                  </h3>
-                  
-                  {/* Name and Email Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-offWhite/45">
-                        Seu Nome
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        required
-                        placeholder="Ex: João da Silva"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#1A1A1A] border border-white/5 rounded-2xl py-3.5 px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-[#8ac926]/40 transition-colors placeholder-offWhite/20"
-                      />
-                    </div>
+          {/* Left Column: Premium WhatsApp CTA Box */}
+          <div className="lg:col-span-7 bg-[#111111]/85 border border-[#8ac926]/10 rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col justify-center items-center text-center">
+            {/* Background decorative glow */}
+            <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-[#8ac926]/5 rounded-full blur-[80px] pointer-events-none" />
+            
+            <motion.div 
+              className="w-16 h-16 rounded-3xl bg-[#4CAF50]/10 border border-[#4CAF50]/20 flex items-center justify-center text-[#4CAF50] mb-6 shadow-lg shadow-[#4CAF50]/5"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: [0.9, 1.05, 0.9] }}
+              transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+            >
+              <MessageSquare size={32} className="fill-current" />
+            </motion.div>
 
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-offWhite/45">
-                        Seu E-mail
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        placeholder="Ex: joao@gmail.com"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#1A1A1A] border border-white/5 rounded-2xl py-3.5 px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-[#8ac926]/40 transition-colors placeholder-offWhite/20"
-                      />
-                    </div>
-                  </div>
+            <h3 className="text-2xl sm:text-3xl font-black uppercase text-white mb-4 leading-tight">
+              Atendimento Imediato
+            </h3>
+            
+            <p className="text-xs sm:text-sm text-offWhite/65 max-w-md mb-8 leading-relaxed font-medium">
+              Quer saber mais sobre reservas para aniversários, dúvidas sobre cardápio ou falar diretamente com a gerência? Inicie uma conversa segura no nosso WhatsApp.
+            </p>
 
-                  {/* Subject Selection */}
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-offWhite/45">
-                      Assunto da Mensagem
-                    </label>
-                    <select
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      className="w-full bg-[#1A1A1A] border border-white/5 rounded-2xl py-3.5 px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-[#8ac926]/40 transition-colors cursor-pointer"
-                    >
-                      <option value="duvida">Dúvida / Informação</option>
-                      <option value="sugestao">Sugestão de Produto</option>
-                      <option value="elogio">Elogio à Equipe</option>
-                      <option value="reclamacao">Reclamação / Crítica</option>
-                      <option value="franquia">Seja um Franqueado</option>
-                    </select>
-                  </div>
-
-                  {/* Message body */}
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-offWhite/45">
-                      Sua Mensagem
-                    </label>
-                    <textarea
-                      name="message"
-                      required
-                      rows={5}
-                      placeholder="Escreva sua mensagem em detalhes aqui..."
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      className="w-full bg-[#1A1A1A] border border-white/5 rounded-2xl py-3.5 px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-[#8ac926]/40 transition-colors placeholder-offWhite/20 resize-none"
-                    />
-                  </div>
-
-                  {/* Submit button */}
-                  <button
-                    type="submit"
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-[#8ac926] text-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:scale-102 active:scale-98 transition-all duration-300 cursor-pointer shadow-[#8ac926]/10"
-                  >
-                    <Send size={14} className="stroke-[2.5]" />
-                    <span>Enviar Mensagem</span>
-                  </button>
-                </motion.form>
-              ) : (
-                <motion.div
-                  key="success"
-                  className="text-center py-12 flex flex-col items-center gap-4"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                >
-                  <CheckCircle size={56} className="text-[#8ac926] drop-shadow-[0_0_10px_rgba(138,201,38,0.3)] stroke-[1.5]" />
-                  <h3 className="text-xl font-black uppercase text-white">
-                    Mensagem Enviada!
-                  </h3>
-                  <p className="text-xs sm:text-sm text-offWhite/60 max-w-sm leading-relaxed mx-auto font-medium">
-                    Olá, <strong>{formData.name}</strong>! Recebemos a sua mensagem com sucesso. Nossa equipe entrará em contato com você pelo e-mail fornecido em até 24 horas úteis.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Giant WhatsApp Button */}
+            <button
+              onClick={handleWhatsappOpen}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4.5 rounded-2xl bg-[#4CAF50] hover:bg-[#43A047] text-white font-black text-sm sm:text-base uppercase tracking-wider shadow-lg hover:shadow-glow-green hover:scale-103 active:scale-97 transition-all duration-300 cursor-pointer shadow-[#4CAF50]/10"
+            >
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.98-1.865-1.865-4.343-2.89-6.985-2.891-5.439 0-9.865 4.42-9.869 9.865-.001 1.748.461 3.456 1.338 4.966L1.879 21.03l4.768-1.876zm12.338-7.986c-.328-.164-1.94-.957-2.24-1.066-.298-.11-.517-.164-.734.164-.218.328-.846 1.066-1.037 1.284-.19.218-.38.245-.708.081-.328-.164-1.386-.51-2.64-1.627-.975-.87-1.633-1.946-1.824-2.274-.19-.328-.02-.505.143-.668.148-.147.328-.383.493-.574.164-.19.218-.328.328-.547.11-.218.055-.41-.027-.574-.082-.164-.734-1.77-.997-2.42-.258-.633-.518-.547-.708-.557-.183-.01-.39-.01-.6-.01-.21 0-.555.08-.846.398-.29.319-1.11 1.085-1.11 2.648 0 1.564 1.138 3.078 1.293 3.296.155.218 2.24 3.42 5.423 4.795.757.327 1.348.52 1.81.667.76.241 1.45.207 1.996.126.608-.09 1.94-.793 2.214-1.56.273-.766.273-1.422.19-1.56-.081-.137-.298-.218-.626-.382z"/>
+              </svg>
+              <span>Abrir WhatsApp</span>
+            </button>
           </div>
 
           {/* Right Column: Direct support channels */}
@@ -221,7 +130,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToHome }) => {
                 Canais Diretos
               </h3>
               <p className="text-xs text-offWhite/50 leading-relaxed font-medium">
-                Precisa de atendimento de urgência ou quer pedir direto? Fale conosco nos canais telefônicos e e-mail abaixo:
+                Se preferir nos contatar por outros meios, ligue em nossa unidade central ou nos envie um e-mail:
               </p>
               
               {/* Phone Channel */}

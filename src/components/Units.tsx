@@ -7,7 +7,7 @@ import { SpotlightCard } from './ui/SpotlightCard';
 
 export const Units: React.FC = () => {
   const handleWhatsappOrder = (unit: UnitInfo) => {
-    const text = encodeURIComponent(`Olá! Gostaria de fazer um pedido para entrega ou retirada na Unidade ${unit.name === 'Presidente Vargas' ? 'Presidente Vargas' : 'Paulo VI'}.`);
+    const text = encodeURIComponent("Olá! Vi o site e quero saber mais sobre a Casa de Sucos 100 Igual.");
     window.open(`https://wa.me/${unit.whatsapp}?text=${text}`, '_blank');
   };
 
@@ -155,10 +155,10 @@ export const Units: React.FC = () => {
 
                       <button
                         onClick={() => handleWhatsappOrder(unit)}
-                        className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-orangeCitrus to-orangeGold text-darkBg text-xs md:text-sm font-black hover:shadow-glow-orange hover:scale-102 active:scale-98 transition-all duration-300 shadow-md"
+                        className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-orangeCitrus to-orangeGold text-darkBg text-xs md:text-sm font-black hover:shadow-glow-orange hover:scale-102 active:scale-98 transition-all duration-300 shadow-md cursor-pointer"
                       >
                         <MessageSquare size={14} />
-                        <span>Pedir nesta Unidade</span>
+                        <span>Falar pelo WhatsApp</span>
                       </button>
 
                     </div>
