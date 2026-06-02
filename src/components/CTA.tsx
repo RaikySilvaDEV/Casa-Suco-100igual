@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Mail, Clock, Heart } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 
 interface CTAProps {
   onPageChange?: (page: 'home' | 'menu' | 'about' | 'stores' | 'benefits' | 'contact') => void;
