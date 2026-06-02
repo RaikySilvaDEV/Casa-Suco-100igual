@@ -228,9 +228,7 @@ export const CTA: React.FC<CTAProps> = ({ onPageChange }) => {
           </div>
 
           <div className="flex items-center gap-1">
-            <span>Desenvolvido com</span>
-            <Heart size={9} className="text-red-500 fill-red-500 animate-pulse" />
-            <span>em Franca-SP.</span>
+            <span>Desenvolvido por <span className="text-[#8ac926] font-semibold">Raiky Silva</span></span>
           </div>
         </div>
 
